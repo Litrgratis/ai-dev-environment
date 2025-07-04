@@ -1,0 +1,3 @@
+FROM node:20-alpine
+WORKDIR /workspace
+# ...add AI tools, Python, etc. as needed...

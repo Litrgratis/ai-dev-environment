@@ -28,5 +28,10 @@
     "@types/node": "^20.11.30",
     "@types/jest": "^29.5.12",
     "ts-node": "^10.9.2"
-  }
+  },
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ]
 }

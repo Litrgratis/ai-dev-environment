@@ -1,3 +1,12 @@
+# Kubernetes manifests
+infrastructure/kubernetes/*
+!infrastructure/kubernetes/README.md
+
+# Ignore secrets
+.env
+.env.local
+.env.*.local
+
+# Node
 node_modules/
-backend/.env
-*.zip
+dist/

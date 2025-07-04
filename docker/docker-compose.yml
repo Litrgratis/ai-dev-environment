@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  # Only for local development/testing. For production use Kubernetes manifests.
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_PASSWORD: example
+    ports:
+      - "5432:5432"
+  redis:
+    image: redis:6.2-alpine
+    ports:
+      - "6379:6379"
+# Other services should be migrated to Kubernetes (see /infrastructure/kubernetes)
