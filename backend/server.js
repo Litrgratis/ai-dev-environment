@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Prosta baza użytkowników w pamięci
+// Prosta baza użytkowników w pamięci (w produkcji użyj bazy danych)
 const users = [
   { id: 1, username: 'user1', password: bcrypt.hashSync('password123', 10) }
 ];
