@@ -1,37 +1,35 @@
 {
-  "name": "ai-dev-backend",
+  "name": "ai-dev-environment",
   "version": "1.0.0",
-  "description": "Backend for AI Development Environment",
-  "main": "server.js",
-  "scripts": {
-    "start": "ts-node server.ts",
-    "build": "tsc",
-    "test": "jest"
-  },
-  "dependencies": {
-    "fastify": "^4.27.2",
-    "fastify-cors": "^8.4.0",
-    "fastify-jwt": "^7.0.0",
-    "apollo-server-fastify": "^3.13.0",
-    "graphql": "^16.8.1",
-    "@kubernetes/client-node": "^0.19.3",
-    "jsonwebtoken": "^9.0.2",
-    "bcrypt": "^5.1.1",
-    "adm-zip": "^0.5.10",
-    "dotenv": "^16.3.1"
-  },
-  "devDependencies": {
-    "jest": "^29.7.0",
-    "supertest": "^6.3.3",
-    "jest-fetch-mock": "^3.0.3",
-    "typescript": "^5.3.3",
-    "@types/node": "^20.11.30",
-    "@types/jest": "^29.5.12",
-    "ts-node": "^10.9.2"
-  },
+  "description": "Aplikacja umożliwiająca generowanie kodu za pomocą AI (Google Gemini, OpenAI, Claude) z zabezpieczonym backendem (JWT, Fastify) i obsługą wielu plików w formacie ZIP",
   "private": true,
   "workspaces": [
     "backend",
     "frontend"
-  ]
+  ],
+  "scripts": {
+    "start": "npm run backend && npm run frontend",
+    "dev": "npm run backend && npm run frontend",
+    "frontend": "cd frontend && npm start",
+    "backend": "cd backend && npm start",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "build": "cd frontend && npm run build && cd ../backend && npm run build",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "test:all": "./comprehensive-test.sh"
+  },
+  "keywords": [
+    "ai",
+    "gemini",
+    "openai",
+    "claude",
+    "code-generation",
+    "react",
+    "nodejs",
+    "fastify",
+    "jwt"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
 }
