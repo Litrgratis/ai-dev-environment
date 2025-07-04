@@ -1,113 +1,94 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { useTranslation } from 'react-i18next';
-import fetchMock from 'jest-fetch-mock';
-import AIDevEnvironment, { AppProvider } from './App'; // Zakładamy, że AIDevEnvironment jest wyeksportowany
+const express = require('express');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const AdmZip = require('adm-zip');
+require('dotenv').config();
 
-jest.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: key => key,
-    i18n: { changeLanguage: jest.fn() }
-  })
-}));
+const app = express();
+app.use(express.json());
+app.use(cors());
 
-fetchMock.enableMocks();
+// Prosta baza użytkowników w pamięci
+const users = [
+  { id: 1, username: 'user1', password: bcrypt.hashSync('password123', 10) }
+];
 
-describe('AIDevEnvironment', () => {
-  beforeEach(() => {
-    fetchMock.resetMocks();
-    localStorage.clear();
+// Middleware do weryfikacji tokenu JWT
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Brak tokenu autoryzacyjnego' });
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.status(401).json({ error: 'Nieprawidłowy lub wygasły token' });
+    req.user = user;
+    next();
   });
+};
 
-  it('renders login panel when not authenticated', () => {
-    render(
-      <AppProvider>
-        <AIDevEnvironment />
-      </AppProvider>
-    );
+// Inicjalizacja Gemini
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-    expect(screen.getByText('login')).toBeInTheDocument();
-    expect(screen.getByLabelText('username')).toBeInTheDocument();
-    expect(screen.getByLabelText('password')).toBeInTheDocument();
-  });
-
-  it('logs in successfully and shows main UI', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify({ token: 'mocked-token' }));
-
-    render(
-      <AppProvider>
-        <AIDevEnvironment />
-      </AppProvider>
-    );
-
-    fireEvent.change(screen.getByLabelText('username'), { target: { value: 'user1' } });
-    fireEvent.change(screen.getByLabelText('password'), { target: { value: 'password123' } });
-    fireEvent.click(screen.getByText('login'));
-
-    await waitFor(() => {
-      expect(screen.getByText('app_title')).toBeInTheDocument();
-      expect(localStorage.getItem('jwtToken')).toBe('mocked-token');
-    });
-  });
-
-  it('shows error on failed login', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify({ error: 'Nieprawidłowa nazwa użytkownika lub hasło' }), { status: 401 });
-
-    render(
-      <AppProvider>
-        <AIDevEnvironment />
-      </AppProvider>
-    );
-
-    fireEvent.change(screen.getByLabelText('username'), { target: { value: 'user1' } });
-    fireEvent.change(screen.getByLabelText('password'), { target: { value: 'wrongpassword' } });
-    fireEvent.click(screen.getByText('login'));
-
-    await waitFor(() => {
-      expect(screen.getByText('login_failed')).toBeInTheDocument();
-    });
-  });
-
-  it('generates code and downloads ZIP with valid token', async () => {
-    localStorage.setItem('jwtToken', 'mocked-token');
-    fetchMock.mockResponses(
-      [new Blob(['zip-content'], { type: 'application/zip' }), { status: 200, headers: { 'content-type': 'application/zip' } }],
-      [JSON.stringify({ generatedCode: 'const App = () => <div>Hello</div>;' }), { status: 200 }]
-    );
-
-    render(
-      <AppProvider>
-        <AIDevEnvironment />
-      </AppProvider>
-    );
-
-    fireEvent.change(screen.getByLabelText('describe_project'), { target: { value: 'Create a React app' } });
-    fireEvent.click(screen.getByText('generate_with_ai'));
-
-    await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledWith(
-        'http://localhost:3000/api/generate-code',
-        expect.any(Object)
-      );
-      expect(screen.getByText('Projekt wygenerowany! Pobrano plik ZIP. Sprawdź zakładkę "Podgląd".')).toBeInTheDocument();
-    });
-  });
-
-  it('shows unauthorized error and redirects to login', async () => {
-    localStorage.setItem('jwtToken', 'invalid-token');
-    fetchMock.mockResponseOnce(JSON.stringify({ error: 'Nieprawidłowy lub wygasły token' }), { status: 401 });
-
-    render(
-      <AppProvider>
-        <AIDevEnvironment />
-      </AppProvider>
-    );
-
-    fireEvent.change(screen.getByLabelText('describe_project'), { target: { value: 'Create a React app' } });
-    fireEvent.click(screen.getByText('generate_with_ai'));
-
-    await waitFor(() => {
-      expect(screen.getByText('login')).toBeInTheDocument();
-      expect(localStorage.getItem('jwtToken')).toBeNull();
-    });
-  });
+// Endpoint logowania
+app.post('/api/login', async (req, res) => {
+  const { username, password } = req.body;
+  const user = users.find(u => u.username === username);
+  if (!user || !await bcrypt.compare(password, user.password)) {
+    return res.status(401).json({ error: 'Nieprawidłowa nazwa użytkownika lub hasło' });
+  }
+  const token = jwt.sign({ userId: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  res.json({ token });
 });
+
+// Endpoint generowania kodu
+app.post('/api/generate-code', authenticateToken, async (req, res) => {
+  try {
+    const { prompt, framework, style, temperature, includeComments } = req.body;
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro', temperature });
+    const result = await model.generateContent(`Generuj strukturę projektu w ${framework} o stylu ${style}. ${includeComments ? 'Dodaj komentarze.' : ''} Treść: ${prompt}. Zwróć odpowiedź w formacie JSON z kluczami: "files" (obiekt z nazwami plików jako klucze i ich zawartością jako wartości).`);
+    const response = await result.response;
+    const files = JSON.parse(response.text());
+    const zip = new AdmZip();
+    for (const [fileName, content] of Object.entries(files)) {
+      zip.addFile(fileName, Buffer.from(content));
+    }
+    const zipBuffer = zip.toBuffer();
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename=project.zip`);
+    res.send(zipBuffer);
+  } catch (error) {
+    res.status(500).json({ error: 'Błąd serwera podczas generowania kodu AI.' });
+  }
+});
+
+// Endpoint do pobierania głównego pliku
+app.post('/api/get-main-file', authenticateToken, async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const result = await model.generateContent(`Generuj główny plik kodu (np. App.js) dla projektu React na podstawie promptu: ${prompt}.`);
+    const response = await result.response;
+    const generatedCode = response.text();
+    res.json({ generatedCode });
+  } catch (error) {
+    res.status(500).json({ error: 'Błąd serwera podczas pobierania głównego pliku.' });
+  }
+});
+
+// Endpoint czatu
+app.post('/api/chat', authenticateToken, async (req, res) => {
+  try {
+    const { message, model: modelName, temperature } = req.body;
+    const model = genAI.getGenerativeModel({ model: modelName || 'gemini-pro', temperature });
+    const result = await model.generateContent(message);
+    const response = await result.response;
+    const text = response.text();
+    res.json({ response: text });
+  } catch (error) {
+    res.status(500).json({ error: 'Błąd serwera podczas przetwarzania czatu AI.' });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Serwer nasłuchuje na porcie ${PORT}`));
