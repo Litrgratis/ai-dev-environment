@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-dev-environment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ai-dev-environment
+  template:
+    metadata:
+      labels:
+        app: ai-dev-environment
+    spec:
+      containers:
+      - name: app
+        image: ai-dev-environment:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
