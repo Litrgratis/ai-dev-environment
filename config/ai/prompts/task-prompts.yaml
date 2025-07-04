@@ -1,0 +1,3 @@
+task_prompts:
+  code_generation: "Generate code for the following requirements:"
+  bug_fixing: "Find and fix bugs in the following code:"

@@ -1,0 +1,4 @@
+optimization:
+  enable_algorithm_optimization: true
+  enable_database_optimization: true
+  enable_memory_optimization: true

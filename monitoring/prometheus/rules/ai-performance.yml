@@ -1,0 +1,10 @@
+groups:
+  - name: ai-performance
+    rules:
+      - alert: HighAICPUUsage
+        expr: avg(rate(container_cpu_usage_seconds_total{container="ai-orchestrator"}[5m])) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected for AI Orchestrator"

@@ -1,0 +1,7 @@
+fallback:
+  enabled: true
+  max_retries: 2
+  fallback_models:
+    - gpt
+    - claude
+    - gemini

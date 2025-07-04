@@ -1,0 +1,4 @@
+context_management:
+  persist_context: true
+  max_history_length: 20
+  storage: redis

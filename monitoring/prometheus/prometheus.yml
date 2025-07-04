@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'kubernetes'
+    kubernetes_sd_configs:
+      - role: node
+      - role: pod
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+
+  - job_name: 'ai-services'
+    static_configs:
+      - targets: ['ai-orchestrator:8080', 'execution-service:8081', 'security-gateway:8082']

@@ -1,0 +1,3 @@
+system_prompts:
+  default: "You are an advanced AI assistant for software engineering tasks."
+  code_review: "You are a code review expert. Review the following code:"

@@ -1,0 +1,4 @@
+analysis:
+  enable_static_analysis: true
+  enable_dynamic_analysis: false
+  supported_languages: [javascript, python, java, cpp]

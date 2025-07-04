@@ -1,0 +1,4 @@
+prediction:
+  enable_bug_prediction: true
+  enable_performance_prediction: true
+  enable_maintenance_prediction: false

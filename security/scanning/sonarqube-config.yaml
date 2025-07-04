@@ -1,0 +1,5 @@
+sonar:
+  host:
+    url: http://sonarqube:9000
+  login: <SONARQUBE_TOKEN>
+  projectKey: ai-dev-env

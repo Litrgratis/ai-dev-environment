@@ -1,0 +1,4 @@
+learning:
+  enable_pattern_learning: true
+  enable_preference_learning: true
+  enable_feedback_learning: true

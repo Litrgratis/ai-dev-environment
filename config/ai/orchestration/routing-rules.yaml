@@ -1,0 +1,7 @@
+routing:
+  - task: code-generation
+    preferred_models: [gpt, claude, codestral]
+  - task: code-analysis
+    preferred_models: [gemini, gpt]
+  - task: bug-fixing
+    preferred_models: [claude, gpt, deepseek]

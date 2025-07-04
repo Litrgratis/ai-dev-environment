@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: security-gateway
+  namespace: ai-dev-env
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: security-gateway
+  template:
+    metadata:
+      labels:
+        app: security-gateway
+    spec:
+      containers:
+        - name: security-gateway
+          image: yourrepo/security-gateway:latest
+          ports:
+            - containerPort: 8082
+          envFrom:
+            - configMapRef:
+                name: security-gateway-config

@@ -1,0 +1,8 @@
+policies:
+  allowUserRegistration: false
+  require2FA: true
+  allowedOrigins:
+    - http://localhost:3000
+    - https://ai-dev-env.local
+  rateLimit:
+    requestsPerMinute: 60

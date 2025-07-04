@@ -1,0 +1,7 @@
+models:
+  - name: gpt-4
+    endpoint: http://localhost:8001
+    enabled: true
+  - name: codex
+    endpoint: http://localhost:8002
+    enabled: true

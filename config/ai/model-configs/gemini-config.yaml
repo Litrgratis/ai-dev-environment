@@ -1,0 +1,7 @@
+model:
+  name: gemini
+  endpoint: http://localhost:8004
+  enabled: true
+  parameters:
+    temperature: 0.6
+    max_tokens: 2048

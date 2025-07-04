@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgresql-ha
+  namespace: ai-dev-env
+spec:
+  serviceName: postgresql
+  replicas: 3
+  selector:
+    matchLabels:
+      app: postgresql
+  template:
+    metadata:
+      labels:
+        app: postgresql
+    spec:
+      containers:
+        - name: postgresql
+          image: bitnami/postgresql:13
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-secret
+                  key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql
+  namespace: ai-dev-env
+spec:
+  ports:
+    - port: 5432
+  clusterIP: None
+  selector:
+    app: postgresql

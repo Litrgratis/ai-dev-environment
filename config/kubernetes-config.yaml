@@ -1,0 +1,5 @@
+cluster:
+  name: ai-dev-env
+  namespace: ai-dev-env
+  context: ai-dev-env-context
+  apiServer: https://kubernetes.local:6443

@@ -1,0 +1,3 @@
+feedback_prompts:
+  request_feedback: "Please provide feedback on the following result:"
+  thank_you: "Thank you for your feedback!"

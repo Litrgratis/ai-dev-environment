@@ -1,0 +1,5 @@
+features:
+  realtimeCollaboration: true
+  aiAssistedCoding: true
+  kubernetesExecution: true
+  advancedSecurity: false

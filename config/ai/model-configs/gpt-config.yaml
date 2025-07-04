@@ -1,0 +1,7 @@
+model:
+  name: gpt
+  endpoint: http://localhost:8001
+  enabled: true
+  parameters:
+    temperature: 0.8
+    max_tokens: 2048

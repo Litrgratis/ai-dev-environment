@@ -1,0 +1,10 @@
+groups:
+  - name: security
+    rules:
+      - alert: UnauthorizedAccess
+        expr: sum(rate(http_requests_total{status="401"}[5m])) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Multiple unauthorized access attempts detected"

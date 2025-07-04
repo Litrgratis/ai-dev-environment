@@ -1,0 +1,3 @@
+load_balancing:
+  strategy: round_robin
+  health_check_interval: 30s

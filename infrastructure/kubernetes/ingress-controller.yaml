@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ai-dev-env-ingress
+  namespace: ai-dev-env
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: ai-dev-env.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ai-orchestrator
+                port:
+                  number: 8080
+          - path: /exec
+            pathType: Prefix
+            backend:
+              service:
+                name: execution-service
+                port:
+                  number: 8081
+          - path: /security
+            pathType: Prefix
+            backend:
+              service:
+                name: security-gateway
+                port:
+                  number: 8082

@@ -1,0 +1,39 @@
+type Query {
+  aiModels: [AIModel!]!
+  analyzeCode(source: String!): CodeAnalysisResult!
+}
+
+type Mutation {
+  generateCode(prompt: String!): GeneratedCode!
+  optimizeCode(source: String!): OptimizedCode!
+}
+
+type Subscription {
+  aiEvents: AIEvent!
+}
+
+type AIModel {
+  name: String!
+  description: String
+  enabled: Boolean!
+}
+
+type CodeAnalysisResult {
+  issues: [String!]!
+  summary: String
+}
+
+type GeneratedCode {
+  code: String!
+  explanation: String
+}
+
+type OptimizedCode {
+  code: String!
+  improvements: [String!]!
+}
+
+type AIEvent {
+  type: String!
+  payload: String
+}

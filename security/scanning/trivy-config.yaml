@@ -1,0 +1,5 @@
+trivy:
+  severity: CRITICAL,HIGH
+  ignore-unfixed: true
+  exit-code: 1
+  timeout: 5m
