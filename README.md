@@ -14,7 +14,7 @@ Aplikacja umożliwiająca generowanie kodu za pomocą AI (Google Gemini) z zabez
 ## Instalacja
 1. Sklonuj repozytorium:
    ```bash
-   git clone https://github.com/your-username/ai-dev-environment.git
+   git clone https://github.com/Litrgratis/ai-dev-environment.git
    ```
 2. Przejdź do katalogu projektu:
    ```bash
