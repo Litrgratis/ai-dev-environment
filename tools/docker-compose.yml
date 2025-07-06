@@ -1,0 +1,5 @@
+# Docker Compose dla ai-dev-environment (przykład)
+version: '3.8'
+services:
+  app:
+    build: ..

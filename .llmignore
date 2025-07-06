@@ -1,0 +1,255 @@
+# AI Development Environment - LLM Ignore File
+# Pliki i katalogi wykluczane z analizy LLM
+
+# Systemy kontroli wersji
+.git/
+.gitignore
+.gitkeep
+.gitattributes
+.gitmodules
+
+# Środowiska wirtualne i pakiety
+venv/
+env/
+.env
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Pliki IDE i edytory
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logi i pliki tymczasowe
+*.log
+*.tmp
+*.temp
+logs/
+temp/
+tmp/
+.cache/
+
+# Pliki binarne i skompilowane
+*.exe
+*.dll
+*.so
+*.dylib
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Obrazy i multimedia
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.ico
+*.svg
+*.mp4
+*.avi
+*.mkv
+*.mp3
+*.wav
+*.flac
+
+# Dokumenty i archiwa
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+
+# Pliki konfiguracyjne systemu
+*.ini
+*.cfg
+desktop.ini
+.thumbs
+
+# Bazy danych
+*.db
+*.sqlite
+*.sqlite3
+*.mdb
+
+# Pliki bezpieczeństwa
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+secrets.yaml
+credentials.json
+
+# Pliki wygenerowane przez LLM
+llm-output/
+llm-report.md
+*.ai-generated.md
+
+# Modele ML i duże pliki
+*.h5
+*.pkl
+*.joblib
+*.model
+*.bin
+*.safetensors
+ml-pipeline/models/
+models/
+*.onnx
+*.tflite
+
+# Dokumentacja wygenerowana
+docs/_build/
+site/
+_site/
+dist/
+build/
+
+# Pliki testowe i mock
+test_data/
+mock_data/
+fixtures/
+*.fixture
+
+# Pliki backupu
+*.bak
+*.backup
+*.old
+*.orig
+
+# Pliki cache
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb
+
+# Specific dla tego projektu
+docker/volumes/
+infrastructure/secrets/
+k8s/secrets/
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
+
+# Pliki README w językach innych niż angielski
+README_*.md
+CHANGELOG_*.md
+LICENSE_*.md
+
+# Pliki konfiguracyjne deployment
+*.production.yaml
+*.staging.yaml
+*.development.yaml
+
+# Pliki vendor/dependencies
+vendor/
+third_party/
+external/
+
+# Pliki z dużą ilością danych
+*.csv
+*.tsv
+*.json.gz
+*.xml.gz
+data/
+datasets/
+
+# Pliki konfiguracyjne Docker
+docker-compose.override.yml
+.dockerignore
+
+# Pliki Kubernetes secrets
+*-secret.yaml
+*-secrets.yaml
+
+# Pliki Terraform
+*.tfvars
+*.tfvars.json
+
+# Pliki monitoring
+*.metrics
+*.traces
+monitoring/data/
+
+# Pliki lokalizacji
+locale/
+i18n/
+translations/
+
+# Pliki wyników testów
+test-results/
+coverage/
+junit.xml
+coverage.xml
+
+# Pliki migracji bazy danych
+migrations/
+alembic/versions/
+
+# Pliki z hasłami i tokenami
+.env.local
+.env.production
+.env.staging
+*.token
+*.secret
+
+# Pliki systemowe Windows
+*.lnk
+*.url
+*.cmd
+*.bat
+
+# Pliki systemowe macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+
+# Pliki systemowe Linux
+*.desktop
+*.AppImage
+
+# Pliki z długimi logami
+*.access.log
+*.error.log
+*.debug.log
+application.log
+
+# Pliki z danymi sesji
+sessions/
+*.session
+
+# Pliki zawierające PII
+*personal*
+*private*
+*confidential*
+*sensitive*

@@ -1,0 +1,10 @@
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    command: redis-server --daemonize yes
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"

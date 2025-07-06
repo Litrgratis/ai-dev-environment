@@ -4,6 +4,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const AdmZip = require('adm-zip');
+const SecurityMiddleware = require('./middleware');
 require('dotenv').config();
 
 const app = express();
@@ -30,8 +31,27 @@ const authenticateToken = (req, res, next) => {
 // Inicjalizacja Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    version: process.env.npm_package_version || '1.0.0'
+  });
+});
+
+// Setup security middleware
+SecurityMiddleware.setupSecurity(app);
+
 // Endpoint logowania
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', 
+  SecurityMiddleware.validateLogin(),
+  SecurityMiddleware.handleValidationErrors,
+  SecurityMiddleware.sanitizeInput,
+  SecurityMiddleware.auditLog,
+  async (req, res) => {
   const { username, password } = req.body;
   const user = users.find(u => u.username === username);
   if (!user || !await bcrypt.compare(password, user.password)) {
@@ -42,7 +62,13 @@ app.post('/api/login', async (req, res) => {
 });
 
 // Endpoint generowania kodu
-app.post('/api/generate-code', authenticateToken, async (req, res) => {
+app.post('/api/generate-code', 
+  authenticateToken,
+  SecurityMiddleware.validateCodeGeneration(),
+  SecurityMiddleware.handleValidationErrors,
+  SecurityMiddleware.sanitizeInput,
+  SecurityMiddleware.auditLog,
+  async (req, res) => {
   try {
     const { prompt, framework, style, temperature, includeComments } = req.body;
     const model = genAI.getGenerativeModel({ model: 'gemini-pro', temperature });
@@ -77,7 +103,13 @@ app.post('/api/get-main-file', authenticateToken, async (req, res) => {
 });
 
 // Endpoint czatu
-app.post('/api/chat', authenticateToken, async (req, res) => {
+app.post('/api/chat', 
+  authenticateToken,
+  SecurityMiddleware.validateChatMessage(),
+  SecurityMiddleware.handleValidationErrors,
+  SecurityMiddleware.sanitizeInput,
+  SecurityMiddleware.auditLog,
+  async (req, res) => {
   try {
     const { message, model: modelName, temperature } = req.body;
     const model = genAI.getGenerativeModel({ model: modelName || 'gemini-pro', temperature });

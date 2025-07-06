@@ -1,0 +1,300 @@
+# AI Development Environment - LLM Configuration
+# Centralna konfiguracja dla lokalnego środowiska LLM
+
+# Informacje o projekcie
+project:
+  name: "AI Development Environment"
+  version: "1.0.0"
+  description: "Local LLM platform for code analysis and development"
+  author: "AI Dev Team"
+
+# Konfiguracja modeli LLM
+models:
+  # Domyślny model
+  default: "mistral:7b"
+  
+  # Dostępne modele
+  available:
+    - name: "mistral:7b"
+      type: "code_analysis"
+      context_length: 4096
+      temperature: 0.1
+      max_tokens: 2048
+      description: "Mistral 7B - główny model do analizy kodu"
+      
+    - name: "codellama:7b"
+      type: "code_generation"
+      context_length: 4096
+      temperature: 0.2
+      max_tokens: 1024
+      description: "CodeLlama 7B - model do generowania kodu"
+      
+    - name: "llama3:8b"
+      type: "documentation"
+      context_length: 8192
+      temperature: 0.3
+      max_tokens: 1024
+      description: "Llama 3 8B - model do dokumentacji"
+
+# Konfiguracja serwisów
+services:
+  ollama:
+    base_url: "http://localhost:11434"
+    timeout: 30
+    max_retries: 3
+    
+  redis:
+    url: "redis://localhost:6379"
+    db: 0
+    timeout: 5
+    
+  jupyter:
+    port: 8888
+    token: "ai-dev-jupyter-token"
+    
+  flask:
+    port: 5000
+    debug: true
+
+# Konfiguracja tasków
+tasks:
+  analyze:
+    model: "mistral:7b"
+    max_files: 100
+    chunk_size: 2000
+    temperature: 0.1
+    
+  document:
+    model: "llama3:8b"
+    max_files: 50
+    chunk_size: 1500
+    temperature: 0.3
+    
+  test:
+    model: "codellama:7b"
+    max_files: 30
+    chunk_size: 1000
+    temperature: 0.2
+    
+  refactor:
+    model: "mistral:7b"
+    max_files: 20
+    chunk_size: 1500
+    temperature: 0.1
+
+# Rate limiting
+rate_limits:
+  default:
+    max_requests: 100
+    window_seconds: 3600
+    block_duration: 7200
+    
+  llm_analyze:
+    max_requests: 50
+    window_seconds: 3600
+    block_duration: 3600
+    
+  llm_generate:
+    max_requests: 30
+    window_seconds: 3600
+    block_duration: 3600
+
+# Chunking configuration
+chunking:
+  default_size: 2000
+  overlap: 200
+  min_size: 500
+  max_size: 4000
+  
+  # Ustawienia dla różnych typów plików
+  file_types:
+    python: 2000
+    javascript: 1800
+    typescript: 1800
+    java: 2200
+    cpp: 2200
+    markdown: 1500
+    yaml: 1000
+    json: 1000
+
+# Caching
+cache:
+  enabled: true
+  ttl: 3600  # 1 godzina
+  max_size: 1000
+  cleanup_interval: 1800  # 30 minut
+
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/ai-dev-environment.log"
+  max_size: "10MB"
+  backup_count: 5
+
+# Output configuration
+output:
+  directory: "llm-output"
+  format: "markdown"
+  include_metadata: true
+  
+  # Struktura katalogów
+  structure:
+    analyses: "analyses"
+    documentation: "documentation"
+    tests: "tests"
+    refactoring: "refactoring"
+    reports: "reports"
+
+# Security settings
+security:
+  encrypt_env: true
+  whitelist_ips:
+    - "127.0.0.1"
+    - "::1"
+    - "0.0.0.0"
+  
+  # Allowed file extensions
+  allowed_extensions:
+    - ".py"
+    - ".js"
+    - ".ts"
+    - ".jsx"
+    - ".tsx"
+    - ".java"
+    - ".cpp"
+    - ".c"
+    - ".h"
+    - ".hpp"
+    - ".rs"
+    - ".go"
+    - ".rb"
+    - ".php"
+    - ".sql"
+    - ".yaml"
+    - ".yml"
+    - ".json"
+    - ".xml"
+    - ".md"
+    - ".txt"
+    - ".sh"
+    - ".bash"
+
+# Prompt templates
+prompts:
+  analyze:
+    system: "You are a code analysis expert. Analyze the provided code for:"
+    user: |
+      Please analyze this {file_type} code:
+      
+      File: {file_path}
+      
+      ```{file_type}
+      {code}
+      ```
+      
+      Focus on:
+      - Code quality and best practices
+      - Potential bugs or security issues
+      - Performance considerations
+      - Maintainability
+      
+      Provide specific, actionable recommendations.
+      
+  document:
+    system: "You are a technical documentation expert."
+    user: |
+      Create comprehensive documentation for this {file_type} code:
+      
+      File: {file_path}
+      
+      ```{file_type}
+      {code}
+      ```
+      
+      Include:
+      - Purpose and functionality
+      - Parameters and return values
+      - Usage examples
+      - Dependencies
+      
+  test:
+    system: "You are a test automation expert."
+    user: |
+      Generate comprehensive tests for this {file_type} code:
+      
+      File: {file_path}
+      
+      ```{file_type}
+      {code}
+      ```
+      
+      Create:
+      - Unit tests
+      - Integration tests (if applicable)
+      - Edge cases
+      - Mock data examples
+      
+  refactor:
+    system: "You are a code refactoring expert."
+    user: |
+      Suggest refactoring improvements for this {file_type} code:
+      
+      File: {file_path}
+      
+      ```{file_type}
+      {code}
+      ```
+      
+      Focus on:
+      - Code structure and organization
+      - Design patterns
+      - Performance optimizations
+      - Maintainability improvements
+
+# CLI configuration
+cli:
+  default_task: "analyze"
+  silent_mode: false
+  dry_run: false
+  
+  # Argumenty
+  arguments:
+    - name: "task"
+      choices: ["analyze", "document", "test", "refactor"]
+      default: "analyze"
+      
+    - name: "model"
+      default: "mistral:7b"
+      
+    - name: "output"
+      default: "llm-output"
+      
+    - name: "max-files"
+      type: "int"
+      default: 100
+
+# Docker configuration
+docker:
+  image: "ai-dev-environment:latest"
+  ports:
+    - "5000:5000"  # Flask
+    - "6379:6379"  # Redis
+    - "8888:8888"  # Jupyter
+    - "11434:11434"  # Ollama
+    
+  volumes:
+    - "./llm-output:/app/llm-output"
+    - "./logs:/app/logs"
+    - "./ml-pipeline/models:/app/models"
+
+# Environment variables template
+env_template:
+  OLLAMA_BASE_URL: "http://localhost:11434"
+  REDIS_URL: "redis://localhost:6379"
+  FLASK_PORT: "5000"
+  JUPYTER_TOKEN: "ai-dev-jupyter-token"
+  LOG_LEVEL: "INFO"
+  RATE_LIMIT_ENABLED: "true"
+  CACHE_ENABLED: "true"
+  OFFLINE_MODE: "true"
