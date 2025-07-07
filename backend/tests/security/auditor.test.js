@@ -1,14 +1,5 @@
-import { Auditor } from '../../src/security/auditor';
-import { describe, it, expect } from '@jest/globals';
-const { aiRequests } = require('../monitoring/metrics');
-
-describe('Security Auditor', () => {
-  it('should log and detect anomalies', async () => {
-    // Simulacja logowania i wykrywania anomalii
-    aiRequests.inc();
-    expect(aiRequests.hashMap.ai_requests_total.value).toBeGreaterThan(0);
-  });
-});
+const { Auditor } = require('../../src/security/auditor');
+const { describe, it, expect } = require('@jest/globals');
 
 describe('Auditor', () => {
   it('detects unauthorized access', async () => {

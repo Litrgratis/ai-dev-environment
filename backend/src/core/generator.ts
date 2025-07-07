@@ -9,7 +9,7 @@ export class CodeGenerator {
 
   async generate(prompt: string, language: string): Promise<{ code: string }> {
     const model = this.genAI.getGenerativeModel({ model: 'gemini-pro' });
-    const template = prompts.generate[language] || prompts.generate.default;
+    const template = (prompts.generate as Record<string, string>)[language] || prompts.generate.default;
     const fullPrompt = template.replace('{{prompt}}', prompt);
     const result = await model.generateContent(fullPrompt);
     const response = await result.response;

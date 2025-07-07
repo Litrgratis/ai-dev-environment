@@ -6,6 +6,7 @@ app.use(express.json());
 app.use('/auth', require('./routes/auth'));
 app.use('/ai', require('./routes/ai'));
 app.use('/users', require('./routes/users'));
+app.use('/pipeline', require('./routes/generatorCritic'));
 
 app.get('/api/metrics', async (req, res) => {
   res.set('Content-Type', register.contentType);

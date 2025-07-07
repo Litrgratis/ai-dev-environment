@@ -1,4 +1,4 @@
-import { LLMRouter } from '../../../src/llm/router';
+const { LLMRouter } = require('../../src/llm/router');
 describe('LLMRouter', () => {
   it('routes to Gemini', async () => {
     const router = new LLMRouter({ geminiKey: 'g', openaiKey: 'o', ollamaUrl: 'u' });

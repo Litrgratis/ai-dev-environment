@@ -12,6 +12,8 @@ services:
       - MONITOR_ENDPOINT=${MONITOR_ENDPOINT}
       - CLOUD_PROVIDER=${CLOUD_PROVIDER}
       - K8S_CONFIG_PATH=${K8S_CONFIG_PATH}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     ports:
       - "8000:8000"
     depends_on:

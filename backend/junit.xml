@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="27" failures="1" errors="0" time="1.792">
+  <testsuite name="LLMRouter" errors="0" failures="0" skipped="0" timestamp="2025-07-07T21:31:28" time="0.206" tests="3">
+    <testcase classname="LLMRouter routes to Gemini" name="LLMRouter routes to Gemini" time="0.004">
+    </testcase>
+    <testcase classname="LLMRouter routes to OpenAI" name="LLMRouter routes to OpenAI" time="0.001">
+    </testcase>
+    <testcase classname="LLMRouter routes to Ollama" name="LLMRouter routes to Ollama" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="POST /pipeline/generator-critic" errors="0" failures="0" skipped="0" timestamp="2025-07-07T21:31:28" time="0.292" tests="3">
+    <testcase classname="POST /pipeline/generator-critic returns mock Generator-Critic result for JS" name="POST /pipeline/generator-critic returns mock Generator-Critic result for JS" time="0.073">
+    </testcase>
+    <testcase classname="POST /pipeline/generator-critic returns 400 for missing prompt" name="POST /pipeline/generator-critic returns 400 for missing prompt" time="0.011">
+    </testcase>
+    <testcase classname="POST /pipeline/generator-critic returns mock Generator-Critic result for Java" name="POST /pipeline/generator-critic returns mock Generator-Critic result for Java" time="0.015">
+    </testcase>
+  </testsuite>
+  <testsuite name="FeedbackCollector" errors="0" failures="0" skipped="0" timestamp="2025-07-07T21:31:29" time="0.036" tests="1">
+    <testcase classname="FeedbackCollector collects and retrieves feedback" name="FeedbackCollector collects and retrieves feedback" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="AIService (mocked LLM) - extended" errors="0" failures="0" skipped="0" timestamp="2025-07-07T21:31:29" time="0.077" tests="12">
+    <testcase classname="AIService (mocked LLM) - extended returns fallback for empty prompt" name="AIService (mocked LLM) - extended returns fallback for empty prompt" time="0.001">
+    </testcase>
+    <testcase classname="AIService (mocked LLM) - extended buildEnhancedPrompt handles missing options" name="AIService (mocked LLM) - extended buildEnhancedPrompt handles missing options" time="0.001">
+    </testcase>
+    <testcase classname="AIService (mocked LLM) - extended parseGeneratedCode handles nested files" name="AIService (mocked LLM) - extended parseGeneratedCode handles nested files" time="0.003">
+    </testcase>
+    <testcase classname="AIService (mocked LLM) - extended parseGeneratedCode always returns setup_instructions" name="AIService (mocked LLM) - extended parseGeneratedCode always returns setup_instructions" time="0.001">
+    </testcase>
+    <testcase classname="AIService (mocked LLM) - extended buildEnhancedPrompt includes temperature and style" name="AIService (mocked LLM) - extended buildEnhancedPrompt includes temperature and style" time="0.001">
+    </testcase>
+    <testcase classname="AIService (mocked LLM) - extended parseGeneratedCode returns valid JSON for valid input" name="AIService (mocked LLM) - extended parseGeneratedCode returns valid JSON for valid input" time="0.002">
+    </testcase>
+    <testcase classname="AIService (mocked LLM) - extended parseGeneratedCode returns fallback for invalid JSON" name="AIService (mocked LLM) - extended parseGeneratedCode returns fallback for invalid JSON" time="0.001">
+    </testcase>
+    <testcase classname="AIService (mocked LLM) - extended buildEnhancedPrompt includes language" name="AIService (mocked LLM) - extended buildEnhancedPrompt includes language" time="0">
+    </testcase>
+    <testcase classname="AIService (mocked LLM) - extended parseGeneratedCode returns empty dependencies if not present" name="AIService (mocked LLM) - extended parseGeneratedCode returns empty dependencies if not present" time="0.003">
+    </testcase>
+    <testcase classname="AIService (mocked LLM) - extended parseGeneratedCode returns default description if not present" name="AIService (mocked LLM) - extended parseGeneratedCode returns default description if not present" time="0.001">
+    </testcase>
+    <testcase classname="AIService (mocked LLM) - extended parseGeneratedCode returns default setup_instructions if not present" name="AIService (mocked LLM) - extended parseGeneratedCode returns default setup_instructions if not present" time="0.003">
+    </testcase>
+    <testcase classname="AIService (mocked LLM) - extended buildEnhancedPrompt includes Include Comments" name="AIService (mocked LLM) - extended buildEnhancedPrompt includes Include Comments" time="0.02">
+    </testcase>
+  </testsuite>
+  <testsuite name="DeploymentManager" errors="0" failures="0" skipped="0" timestamp="2025-07-07T21:31:29" time="0.086" tests="2">
+    <testcase classname="DeploymentManager deploys successfully" name="DeploymentManager deploys successfully" time="0.001">
+    </testcase>
+    <testcase classname="DeploymentManager rolls back on failure" name="DeploymentManager rolls back on failure" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="GeminiLLM" errors="0" failures="0" skipped="0" timestamp="2025-07-07T21:31:29" time="0.056" tests="1">
+    <testcase classname="GeminiLLM generates code from prompt" name="GeminiLLM generates code from prompt" time="0.006">
+    </testcase>
+  </testsuite>
+  <testsuite name="AIService (mocked LLM)" errors="0" failures="0" skipped="0" timestamp="2025-07-07T21:31:29" time="0.037" tests="3">
+    <testcase classname="AIService (mocked LLM) parseGeneratedCode returns parsed JSON if valid" name="AIService (mocked LLM) parseGeneratedCode returns parsed JSON if valid" time="0.001">
+    </testcase>
+    <testcase classname="AIService (mocked LLM) parseGeneratedCode returns fallback if not JSON" name="AIService (mocked LLM) parseGeneratedCode returns fallback if not JSON" time="0.002">
+    </testcase>
+    <testcase classname="AIService (mocked LLM) buildEnhancedPrompt includes all options" name="AIService (mocked LLM) buildEnhancedPrompt includes all options" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="Auditor" errors="0" failures="0" skipped="0" timestamp="2025-07-07T21:31:29" time="0.116" tests="1">
+    <testcase classname="Auditor detects unauthorized access" name="Auditor detects unauthorized access" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="API Endpoints" errors="0" failures="1" skipped="0" timestamp="2025-07-07T21:31:30" time="0.252" tests="1">
+    <testcase classname="API Endpoints POST /api/generate-code should return a ZIP file" name="API Endpoints POST /api/generate-code should return a ZIP file" time="0.001">
+      <failure>TypeError: Cannot read properties of undefined (reading &apos;address&apos;)
+    at Test.serverAddress (/workspaces/ai-dev-environment/node_modules/supertest/lib/test.js:46:22)
+    at new Test (/workspaces/ai-dev-environment/node_modules/supertest/lib/test.js:34:14)
+    at Object.obj.&lt;computed&gt; [as post] (/workspaces/ai-dev-environment/node_modules/supertest/index.js:43:18)
+    at Object.post (/workspaces/ai-dev-environment/backend/server.test.js:6:41)
+    at Promise.then.completed (/workspaces/ai-dev-environment/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/workspaces/ai-dev-environment/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/workspaces/ai-dev-environment/node_modules/jest-circus/build/run.js:316:40)
+    at _runTest (/workspaces/ai-dev-environment/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/workspaces/ai-dev-environment/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/workspaces/ai-dev-environment/node_modules/jest-circus/build/run.js:121:9)
+    at run (/workspaces/ai-dev-environment/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/workspaces/ai-dev-environment/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/workspaces/ai-dev-environment/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/workspaces/ai-dev-environment/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/workspaces/ai-dev-environment/node_modules/jest-runner/build/runTest.js:444:34)</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

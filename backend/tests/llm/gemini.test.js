@@ -1,4 +1,4 @@
-import { GeminiLLM } from '../../../src/llm/gemini';
+const { GeminiLLM } = require('../../src/llm/gemini');
 describe('GeminiLLM', () => {
   it('generates code from prompt', async () => {
     const llm = new GeminiLLM('test-key');

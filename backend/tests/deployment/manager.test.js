@@ -1,5 +1,5 @@
-import { DeploymentManager } from '../../src/deployment/manager';
-import { describe, it, expect, jest } from '@jest/globals';
+const { DeploymentManager } = require('../../src/deployment/manager');
+const { describe, it, expect } = require('@jest/globals');
 
 describe('DeploymentManager', () => {
   it('deploys successfully', async () => {

@@ -1,5 +1,6 @@
 import React from 'react';
 import './App.css';
+import AIChat from './components/AIChat.jsx';
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
           Witaj w Twoim AI-Dev-Environment Frontend!
         </p>
       </header>
+      <AIChat />
     </div>
   );
 }

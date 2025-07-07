@@ -1,4 +1,4 @@
-import { FeedbackCollector } from '../../../src/feedback/collector';
+const { FeedbackCollector } = require('../../src/feedback/collector');
 describe('FeedbackCollector', () => {
   it('collects and retrieves feedback', () => {
     const feedback = { score: 80, comments: 'ok' };

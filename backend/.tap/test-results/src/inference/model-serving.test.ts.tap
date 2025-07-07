@@ -1,0 +1,11 @@
+TAP version 14
+{"level":30,"time":1751917317290,"pid":31949,"hostname":"codespaces-d6652b","msg":"Server listening at http://127.0.0.1:8000"}
+{"level":30,"time":1751917317328,"pid":31949,"hostname":"codespaces-d6652b","reqId":"req-1","req":{"method":"POST","url":"/inference","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":58590},"msg":"incoming request"}
+{"level":30,"time":1751917317341,"pid":31949,"hostname":"codespaces-d6652b","reqId":"req-1","res":{"statusCode":200},"responseTime":9.883996999822557,"msg":"request completed"}
+# Subtest: POST /inference returns echo and model info
+    ok 1 - Should return 200 OK
+    ok 2 - Response should contain echo and model info
+    1..2
+ok 1 - POST /inference returns echo and model info # time=69.584ms
+
+1..1
