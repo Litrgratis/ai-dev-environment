@@ -35,6 +35,12 @@ jobs:
       run: npm run lint
     - name: Run type checking
       run: npm run type-check
+    - name: Run tests with coverage
+      run: npm test -- --coverage
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
 
   build-and-deploy:
     needs: test

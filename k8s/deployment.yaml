@@ -61,6 +61,11 @@ spec:
             configMapKeyRef:
               name: ai-dev-config
               key: NODE_ENV
+        - name: MONITOR_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: ai-dev-config
+              key: MONITOR_ENDPOINT
         - name: JWT_SECRET
           valueFrom:
             secretKeyRef:
@@ -90,6 +95,165 @@ spec:
             port: 3000
           initialDelaySeconds: 5
           periodSeconds: 5
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+      - name: ollama
+        image: ollama/ollama:latest
+        ports:
+        - containerPort: 11434
+      nodeSelector:
+        cloud: "true"
+      tolerations:
+      - key: "dedicated"
+        operator: "Equal"
+        value: "ai"
+        effect: "NoSchedule"
+---
+# Backend Deployment (Express/Fastify)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-dev-backend
+  namespace: ai-dev-environment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ai-dev-backend
+  template:
+    metadata:
+      labels:
+        app: ai-dev-backend
+    spec:
+      containers:
+      - name: backend
+        image: ai-dev-environment:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: GEMINI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ai-dev-secrets
+              key: GEMINI_API_KEY
+        - name: EXEC_SERVICE_URL
+          value: "https://exec-service:443"
+        - name: AI_ORCH_URL
+          value: "https://ai-orch:443"
+        - name: NODE_ENV
+          value: "production"
+        - name: MONITOR_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: ai-dev-config
+              key: MONITOR_ENDPOINT
+        volumeMounts:
+        - name: tls-certs
+          mountPath: /etc/tls
+          readOnly: true
+      volumes:
+      - name: tls-certs
+        secret:
+          secretName: tls-secret
+---
+# Frontend Deployment (React)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-dev-frontend
+  namespace: ai-dev-environment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-dev-frontend
+  template:
+    metadata:
+      labels:
+        app: ai-dev-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: ai-dev-frontend:latest
+        ports:
+        - containerPort: 80
+---
+# Redis Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-dev-redis
+  namespace: ai-dev-environment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-dev-redis
+  template:
+    metadata:
+      labels:
+        app: ai-dev-redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+---
+# PostgreSQL Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-dev-postgres
+  namespace: ai-dev-environment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-dev-postgres
+  template:
+    metadata:
+      labels:
+        app: ai-dev-postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        env:
+        - name: POSTGRES_DB
+          value: ai_dev
+        - name: POSTGRES_USER
+          value: aiuser
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ai-dev-secrets
+              key: DB_PASSWORD
+        ports:
+        - containerPort: 5432
+---
+# HorizontalPodAutoscaler for backend
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ai-dev-backend-hpa
+  namespace: ai-dev-environment
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ai-dev-backend
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
 ---
 apiVersion: v1
 kind: Service
@@ -103,7 +267,7 @@ spec:
   - protocol: TCP
     port: 80
     targetPort: 3000
-  type: ClusterIP
+  type: LoadBalancer
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

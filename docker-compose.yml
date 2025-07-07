@@ -1,10 +1,73 @@
+version: '3.9'
 services:
+  backend:
+    image: ai-dev-environment:latest
+    build:
+      context: ./backend
+    environment:
+      - NODE_ENV=production
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - EXEC_SERVICE_URL=${EXEC_SERVICE_URL}
+      - AI_ORCH_URL=${AI_ORCH_URL}
+      - MONITOR_ENDPOINT=${MONITOR_ENDPOINT}
+      - CLOUD_PROVIDER=${CLOUD_PROVIDER}
+      - K8S_CONFIG_PATH=${K8S_CONFIG_PATH}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - postgres
+    command: ["npm", "start"]
+    networks:
+      - ai-net
+  frontend:
+    image: ai-dev-frontend:latest
+    build:
+      context: ./frontend
+    ports:
+      - "3000:80"
+    networks:
+      - ai-net
   redis:
     image: redis:latest
     ports:
       - "6379:6379"
-    command: redis-server --daemonize yes
+    networks:
+      - ai-net
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=ai_dev
+      - POSTGRES_USER=aiuser
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    networks:
+      - ai-net
   ollama:
     image: ollama/ollama:latest
     ports:
       - "11434:11434"
+    networks:
+      - ai-net
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - ai-net
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3001:3000"
+    networks:
+      - ai-net
+
+networks:
+  ai-net:
+    driver: bridge
+
+# Tryb hybrydowy: offline (OLLAMA) lub online (Gemini API)
+# Ustaw zmienne środowiskowe CLOUD_PROVIDER i K8S_CONFIG_PATH dla chmury

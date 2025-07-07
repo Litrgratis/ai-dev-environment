@@ -1,0 +1,64 @@
+openapi: 3.0.3
+info:
+  title: AI Dev Environment API
+  version: 1.0.0
+  description: API for code generation, analysis, and system orchestration
+servers:
+  - url: /api
+paths:
+  /generate-code:
+    post:
+      summary: Generate code from a prompt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prompt:
+                  type: string
+      responses:
+        '200':
+          description: Generated code
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+  /analyze-code:
+    post:
+      summary: Analyze code for quality and issues
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+      responses:
+        '200':
+          description: Analysis result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  issues:
+                    type: array
+                    items:
+                      type: string
+  /metrics:
+    get:
+      summary: Get system metrics for Prometheus
+      responses:
+        '200':
+          description: Prometheus metrics
+          content:
+            text/plain:
+              schema:
+                type: string

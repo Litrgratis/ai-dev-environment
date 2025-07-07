@@ -1,0 +1,2 @@
+// Przykładowy prompt dla JavaScript
+Napisz funkcję, która sprawdza czy liczba jest liczbą pierwszą.

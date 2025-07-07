@@ -75,44 +75,49 @@ ai-dev-environment/
 └── 📄 README.md           # This file
 ```
 
-## 🚀 Szybki Start
+## 🚀 Szybki start
 
-### Wymagania
-- 🟢 Node.js (>= 18.x)
-- 🐳 Docker & Docker Compose
-- 🔑 Klucz API Google Gemini
-- ☸️ Kubernetes (opcjonalnie)
+```bash
+# Klonowanie repozytorium
+ git clone https://github.com/twoj-org/ai-dev-environment.git
+ cd ai-dev-environment
 
-### Instalacja
+# Uruchomienie środowiska lokalnie (Docker Compose)
+ docker-compose up --build
 
-1. **Sklonuj repozytorium**:
-   ```bash
-   git clone https://github.com/Litrgratis/ai-dev-environment.git
-<<<<<<< HEAD
-   ```
-2. Przejdź do katalogu projektu:
-   ```bash
-   cd ai-dev-environment
-   ```
-3. Skonfiguruj zmienne środowiskowe:
-   - Skopiuj plik `.env.example` do `.env` i dostosuj według potrzeb:
-     ```bash
-     cp .env.example .env
-     ```
-4. Zainstaluj zależności:
-   ```bash
-   npm install
-   ```
-5. Uruchom backend:
-   ```bash
-   npm run start
-   ```
-6. Uruchom frontend:
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
+# Uruchomienie w chmurze (AWS/GCP)
+ export CLOUD_PROVIDER=aws # lub gcp
+ export K8S_CONFIG_PATH=/path/to/kubeconfig
+ ./scripts/setup-cloud.sh
+ kubectl apply -f k8s/
+```
+
+## 🧪 Testy i audyt
+
+```bash
+# Testy jednostkowe i pokrycie
+npm test -- --coverage
+# Raport bezpieczeństwa
+npm audit
+# Raporty Codecov i Snyk dostępne w CI/CD (GitHub Actions)
+```
+
+## 📊 Monitoring i logi
+
+- Endpoint metryk: `GET /api/metrics` (Prometheus)
+- Dashboard: Grafana (http://localhost:3001)
+- Logi: `logs/ai-dev-environment.log`
+
+## 📚 Przykłady promptów i wyników
+
+Zobacz katalog `docs/examples/`:
+- `prompt-js.txt` — przykładowy prompt dla JS
+- `result-js.txt` — przykładowy wynik kodu
+
+## 📝 Audyt i pipeline
+
+- Wyniki pipeline CI/CD i raporty pokrycia dostępne na GitHub (Actions/Codecov)
+- Raporty bezpieczeństwa generowane przez Snyk
 
 ## Użycie z Kubernetes
 
@@ -601,4 +606,3 @@ Ten projekt jest licencjonowany na podstawie MIT License - szczegóły w pliku [
 [![GitHub issues](https://img.shields.io/github/issues/Litrgratis/ai-dev-environment.svg)](https://github.com/Litrgratis/ai-dev-environment/issues)
 
 Made with ❤️ by the AI Development Community
->>>>>>> 17ae7a2 (Initial commit)

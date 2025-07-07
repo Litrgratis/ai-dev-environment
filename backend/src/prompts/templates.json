@@ -1,0 +1,15 @@
+{
+  "generate": {
+    "javascript": "Generate JavaScript code for the following requirements:\n{{prompt}}\nReturn only the code.",
+    "python": "Generate Python code for the following requirements:\n{{prompt}}\nReturn only the code.",
+    "default": "Generate code for the following requirements:\n{{prompt}}\nReturn only the code."
+  },
+  "analyze": {
+    "javascript": "Analyze the following JavaScript code for errors, style, and best practices.\n{{code}}\nReturn feedback.",
+    "python": "Analyze the following Python code for errors, style, and best practices.\n{{code}}\nReturn feedback.",
+    "default": "Analyze the following code for errors, style, and best practices.\n{{code}}\nReturn feedback."
+  },
+  "improve": {
+    "default": "Given the following code and feedback, improve the code.\nCode:\n{{code}}\nFeedback:\n{{feedback}}\nReturn only the improved code."
+  }
+}
