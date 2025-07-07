@@ -29,9 +29,11 @@ services:
     networks:
       - ai-net
   redis:
-    image: redis:latest
+    image: redis:7-alpine
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
     networks:
       - ai-net
   postgres:
@@ -68,6 +70,8 @@ services:
 networks:
   ai-net:
     driver: bridge
+volumes:
+  redis_data:
 
 # Tryb hybrydowy: offline (OLLAMA) lub online (Gemini API)
 # Ustaw zmienne środowiskowe CLOUD_PROVIDER i K8S_CONFIG_PATH dla chmury
