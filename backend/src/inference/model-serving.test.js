@@ -1,4 +1,3 @@
-/// <reference types="node" />
 const tap = require('tap');
 const { createModelServer } = require('./model-serving');
 const nodeFetch = require('node-fetch');
@@ -7,7 +6,6 @@ const MODEL_HOST = process.env.MODEL_HOST || '127.0.0.1';
 const MODEL_PORT = process.env.MODEL_PORT || '8000';
 const BASE_URL = `http://${MODEL_HOST}:${MODEL_PORT}`;
 
-/** @type {import('fastify').FastifyInstance | undefined} */
 let fastify = undefined;
 
 tap.before(async () => {
