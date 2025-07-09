@@ -1,4 +1,4 @@
-const { CompletionService } = require('../services/completionService');
+const { CompletionService } = require('../services/completionService.cjs');
 const jwt = require('jsonwebtoken');
 
 class WebSocketHandler {

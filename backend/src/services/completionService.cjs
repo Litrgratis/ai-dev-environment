@@ -1,6 +1,6 @@
 const Redis = require('ioredis');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const { metricsHelpers, profiler } = require('../monitoring/metricsV2');
+const { metricsHelpers, profiler } = require('../monitoring/metricsV2.cjs');
 
 class CompletionService {
   constructor() {
@@ -36,7 +36,9 @@ class CompletionService {
   // Cache key structure: lang:hash(context)
   getCacheKey(language, context) {
     const crypto = require('crypto');
-    const contextHash = crypto.createHash('md5').update(context).digest('hex');
+    // Ensure context is a string for hashing
+    const contextStr = typeof context === 'string' ? context : JSON.stringify(context);
+    const contextHash = crypto.createHash('md5').update(contextStr).digest('hex');
     return `completion:${language}:${contextHash}`;
   }
 

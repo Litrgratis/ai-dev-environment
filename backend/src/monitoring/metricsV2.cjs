@@ -60,7 +60,7 @@ const cacheHitRate = new client.Gauge({
   registers: [register]
 });
 
-// Performance monitoring
+// Performance monitoring with cleanup
 const memoryUsage = new client.Gauge({
   name: 'nodejs_memory_usage_bytes',
   help: 'Node.js memory usage in bytes',
@@ -68,14 +68,30 @@ const memoryUsage = new client.Gauge({
   registers: [register]
 });
 
-// Update memory metrics every 10 seconds
-setInterval(() => {
-  const mem = process.memoryUsage();
-  memoryUsage.set({ type: 'rss' }, mem.rss);
-  memoryUsage.set({ type: 'heapUsed' }, mem.heapUsed);
-  memoryUsage.set({ type: 'heapTotal' }, mem.heapTotal);
-  memoryUsage.set({ type: 'external' }, mem.external);
-}, 10000);
+// Memory monitoring interval with cleanup support
+let memoryInterval;
+
+const startMemoryMonitoring = () => {
+  if (memoryInterval) return; // Already started
+  
+  memoryInterval = setInterval(() => {
+    const mem = process.memoryUsage();
+    memoryUsage.set({ type: 'rss' }, mem.rss);
+    memoryUsage.set({ type: 'heapUsed' }, mem.heapUsed);
+    memoryUsage.set({ type: 'heapTotal' }, mem.heapTotal);
+    memoryUsage.set({ type: 'external' }, mem.external);
+  }, 10000);
+};
+
+const stopMemoryMonitoring = () => {
+  if (memoryInterval) {
+    clearInterval(memoryInterval);
+    memoryInterval = null;
+  }
+};
+
+// Auto-start monitoring
+startMemoryMonitoring();
 
 // Cache statistics tracker
 class CacheStats {
@@ -214,5 +230,7 @@ module.exports = {
   metricsHelpers,
   profiler,
   getHealthStatus,
-  cacheStats
+  cacheStats,
+  startMemoryMonitoring,
+  stopMemoryMonitoring
 };

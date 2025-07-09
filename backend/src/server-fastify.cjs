@@ -1,20 +1,35 @@
-const fastify = require('fastify')({ logger: true });
+const fastify = require('fastify')({ 
+  logger: true,
+  // Fastify 5.x compatibility
+  disableRequestLogging: false,
+  keepAliveTimeout: 30000
+});
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const { WebSocketHandler } = require('./routes/websocket');
-const { CompletionService } = require('./services/completionService');
+const { WebSocketHandler } = require('./routes/websocket.cjs');
+const { CompletionService } = require('./services/completionService.cjs');
+const { DashboardService } = require('./services/dashboardService.cjs');
+const { CompletionController } = require('./routes/completion.cjs');
+const { dashboardRoutes } = require('./routes/dashboard.cjs');
 require('dotenv').config();
 
+const fastifyCors = require('@fastify/cors');
+const fastifyJwt = require('@fastify/jwt');
+
 async function buildServer() {
-  // Register CORS
-  await fastify.register(require('@fastify/cors'), {
-    origin: true
+  // Register CORS (Fastify 5.x compatible)
+  await fastify.register(fastifyCors.default || fastifyCors, {
+    origin: true,
+    credentials: true
   });
 
-  // Register JWT
-  await fastify.register(require('@fastify/jwt'), {
-    secret: process.env.JWT_SECRET || 'your-secret-key'
+  // Register JWT (Fastify 5.x compatible)  
+  await fastify.register(fastifyJwt.default || fastifyJwt, {
+    secret: process.env.JWT_SECRET || 'your-secret-key',
+    sign: {
+      expiresIn: '1h'
+    }
   });
 
   // Simple in-memory users (replace with proper database in production)
@@ -24,6 +39,8 @@ async function buildServer() {
 
   // Initialize services
   const completionService = new CompletionService();
+  const dashboardService = new DashboardService();
+  const completionController = new CompletionController();
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
   // Health check endpoint
@@ -37,7 +54,7 @@ async function buildServer() {
     };
   });
 
-  // Authentication endpoint
+  // Authentication endpoint (Fastify 5.x compatible)
   fastify.post('/api/login', async (request, reply) => {
     const { username, password } = request.body;
     
@@ -50,49 +67,75 @@ async function buildServer() {
       return reply.status(401).send({ error: 'Invalid username or password' });
     }
 
+    // Fastify 5.x JWT signing
     const token = fastify.jwt.sign({ 
       id: user.id, 
       username: user.username 
-    }, { expiresIn: '1h' });
+    });
     
-    return { token };
+    return { token, user: { id: user.id, username: user.username } };
   });
 
-  // Authentication decorator
+  // Authentication decorator (Fastify 5.x compatible)
   fastify.decorate('authenticate', async function(request, reply) {
     try {
       await request.jwtVerify();
     } catch (err) {
-      reply.send(err);
+      return reply.status(401).send({ error: 'Authentication failed', message: err.message });
     }
   });
 
-  // Code completion endpoint (REST fallback)
+  // Enhanced completion endpoints with schema validation
   fastify.post('/api/completion', {
+    preHandler: [fastify.authenticate],
+    schema: {
+      body: CompletionController.getCompletionSchema()
+    }
+  }, async (request, reply) => {
+    return await completionController.handleCompletion(request, reply);
+  });
+
+  // Batch completion endpoint
+  fastify.post('/api/completion/batch', {
+    preHandler: [fastify.authenticate],
+    schema: {
+      body: {
+        type: 'object',
+        required: ['contexts'],
+        properties: {
+          contexts: {
+            type: 'array',
+            maxItems: 10,
+            items: {
+              type: 'object',
+              required: ['text', 'cursorPosition'],
+              properties: {
+                text: { type: 'string', maxLength: 5000 },
+                cursorPosition: { type: 'number', minimum: 0 }
+              }
+            }
+          },
+          language: { 
+            type: 'string', 
+            enum: ['javascript', 'typescript', 'python', 'java'],
+            default: 'javascript'
+          }
+        }
+      }
+    }
+  }, async (request, reply) => {
+    return await completionController.handleBatchCompletion(request, reply);
+  });
+
+  // Completion statistics
+  fastify.get('/api/completion/stats', {
     preHandler: [fastify.authenticate]
   }, async (request, reply) => {
-    try {
-      const { context, language = 'javascript' } = request.body;
-      
-      if (!context) {
-        return reply.status(400).send({ error: 'Context is required' });
-      }
-
-      const startTime = Date.now();
-      const result = await completionService.generateSuggestions(context, language);
-      const latency = Date.now() - startTime;
-
-      return {
-        suggestions: result.suggestions,
-        fromCache: result.fromCache,
-        latency,
-        language
-      };
-    } catch (error) {
-      fastify.log.error('Error in completion endpoint:', error);
-      return reply.status(500).send({ error: 'Internal server error' });
-    }
+    return await completionController.getCompletionStats(request, reply);
   });
+
+  // Dashboard routes
+  fastify.register(dashboardRoutes, { prefix: '/api/dashboard' });
 
   // UI trigger endpoint - initiate code completion
   fastify.post('/api/trigger-completion', {
@@ -165,6 +208,41 @@ async function buildServer() {
     } catch (error) {
       fastify.log.error('Error in chat endpoint:', error);
       return reply.status(500).send({ error: 'Failed to process chat message' });
+    }
+  });
+
+  // Dashboard endpoints (migrated from Flask)
+  fastify.get('/dashboard', async (request, reply) => {
+    try {
+      const files = await dashboardService.listFiles();
+      const html = dashboardService.generateHTML(files);
+      reply.type('text/html').send(html);
+    } catch (error) {
+      fastify.log.error('Dashboard error:', error);
+      return reply.status(500).send({ error: 'Dashboard unavailable' });
+    }
+  });
+
+  fastify.get('/api/dashboard/files', async (request, reply) => {
+    try {
+      const files = await dashboardService.listFiles();
+      return { files };
+    } catch (error) {
+      fastify.log.error('Dashboard files error:', error);
+      return reply.status(500).send({ error: 'Failed to list files' });
+    }
+  });
+
+  fastify.get('/api/dashboard/file/:filename', async (request, reply) => {
+    try {
+      const { filename } = request.params;
+      const content = await dashboardService.readFile(filename);
+      const stats = await dashboardService.getFileStats(filename);
+      
+      reply.type('text/plain').send(content);
+    } catch (error) {
+      fastify.log.error('File read error:', error);
+      return reply.status(404).send({ error: 'File not found' });
     }
   });
 
