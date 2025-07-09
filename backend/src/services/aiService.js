@@ -198,6 +198,52 @@ Return the response in JSON format.
       throw new Error(`Code optimization failed: ${error.message}`);
     }
   }
+
+  async generatePatch(originalCode, instruction, options = {}) {
+    const { model = 'gemini-pro' } = options;
+
+    try {
+      const aiModel = this.genAI.getGenerativeModel({ model });
+      
+      const prompt = `
+You are an expert software developer specializing in code refactoring and updates. Your task is to generate a code patch based on the provided original code and an instruction for changes.
+
+Original Code:
+\`\`\`
+${originalCode}
+\`\`\`
+
+Instruction:
+"${instruction}"
+
+Please generate a patch in the unified diff format. The patch should only contain the changes needed to accomplish the instruction.
+
+Example of a patch for adding a parameter to a function:
+--- a/file.js
++++ b/file.js
+@@ -1,4 +1,4 @@
+-function greet(name) {
+-  console.log("Hello, " + name);
++function greet(name, punctuation) {
++  console.log("Hello, " + name + punctuation);
+ }
+
+Return ONLY the patch content.
+      `;
+
+      const result = await aiModel.generateContent(prompt);
+      const response = await result.response;
+      const patch = await response.text();
+      
+      return {
+        patch,
+        description: `Patch generated for instruction: "${instruction}"`
+      };
+    } catch (error) {
+      console.error('Patch Generation Error:', error);
+      throw new Error(`Patch generation failed: ${error.message}`);
+    }
+  }
 }
 
 module.exports = AIService;

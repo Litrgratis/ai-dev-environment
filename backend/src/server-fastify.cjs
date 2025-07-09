@@ -12,6 +12,7 @@ const { CompletionService } = require('./services/completionService.cjs');
 const { DashboardService } = require('./services/dashboardService.cjs');
 const { CompletionController } = require('./routes/completion.cjs');
 const { dashboardRoutes } = require('./routes/dashboard.cjs');
+const patchRoutes = require('./routes/patches.cjs');
 require('dotenv').config();
 
 const fastifyCors = require('@fastify/cors');
@@ -136,6 +137,7 @@ async function buildServer() {
 
   // Dashboard routes
   fastify.register(dashboardRoutes, { prefix: '/api/dashboard' });
+  fastify.register(patchRoutes, { prefix: '/api' });
 
   // UI trigger endpoint - initiate code completion
   fastify.post('/api/trigger-completion', {
