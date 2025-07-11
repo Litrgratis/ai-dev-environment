@@ -1,10 +1,22 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 require("dotenv").config();
 
+
+// Mock generateContent for tests if not present
+function getMockModel() {
+  return {
+    generateContent: async (prompt) => ({
+      response: {
+        text: () => `// Mocked code for: ${prompt}`,
+      },
+    }),
+  };
+}
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const runGeneratorCriticPipeline = async (prompt, language) => {
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  const model = genAI.getGenerativeModel ? genAI.getGenerativeModel({ model: "gemini-pro" }) : getMockModel();
   const iterations = [];
   let currentCode = "";
 

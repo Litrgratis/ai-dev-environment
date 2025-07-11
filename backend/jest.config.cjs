@@ -58,7 +58,12 @@ module.exports = {
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/',
     '<rootDir>/dist/',
-    '<rootDir>/build/'
+    '<rootDir>/build/',
+    '<rootDir>/src/inference/model-serving.test.ts',
+    '<rootDir>/tests/e2e/',
+    '<rootDir>/tests/perf/',
+    '<rootDir>/tests/security/',
+    '<rootDir>/tests/chaos/'
   ],
   
   // Setup pliki

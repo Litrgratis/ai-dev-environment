@@ -1,6 +1,6 @@
 const Redis = require("ioredis");
 const { buildServer } = require("../../src/server-fastify.cjs");
-// const { stopMemoryMonitoring } = require('../../src/monitoring/metricsV2');
+const { stopMemoryMonitoring } = require('../../src/monitoring/metricsV2.cjs');
 
 describe("Environment Connectivity Tests - Fastify 5.x", () => {
   let app;
@@ -28,7 +28,7 @@ describe("Environment Connectivity Tests - Fastify 5.x", () => {
 
   afterAll(async () => {
     // Stop monitoring intervals
-    // stopMemoryMonitoring();
+    stopMemoryMonitoring();
 
     // Graceful shutdown
     if (redis) {

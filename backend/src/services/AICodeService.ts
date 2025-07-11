@@ -1,7 +1,7 @@
-import { IAIProvider } from "../types/IAIProvider";
-import { ICodeRepository } from "../repositories/ICodeRepository";
-import { ICacheService } from "../types/ICacheService";
-import { GeneratedCode, GenerateOptions } from "../types/GeneratedCode";
+import { IAIProvider } from "../types/IAIProvider.js";
+import { ICodeRepository } from "../repositories/ICodeRepository.js";
+import { ICacheService } from "../types/ICacheService.js";
+import { GeneratedCode, GenerateOptions } from "../types/GeneratedCode.js";
 
 export class AICodeService {
   constructor(

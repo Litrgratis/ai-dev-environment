@@ -1,5 +1,5 @@
-import { CodeGenerator } from "../core/generator";
-import { CodeCritic } from "../core/critic";
+import { CodeGenerator } from "../core/generator.js";
+import { CodeCritic } from "../core/critic.js";
 
 export type SupportedLanguage = "javascript" | "python" | "java";
 

@@ -1,6 +1,6 @@
 // @ts-ignore
 import esprima from "esprima";
-import prompts from "../prompts/templates.json";
+import prompts from "../prompts/templates.json" with { type: "json" };
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export class CodeCritic {

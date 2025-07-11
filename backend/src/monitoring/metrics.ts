@@ -39,7 +39,7 @@ function updateSystemMetrics() {
   const cpus = os.cpus();
   const cpuLoad =
     cpus.reduce(
-      (acc, cpu) =>
+      (acc: any, cpu: any) =>
         acc + cpu.times.user + cpu.times.nice + cpu.times.sys + cpu.times.irq,
       0,
     ) /
@@ -51,8 +51,8 @@ function updateSystemMetrics() {
 }
 setInterval(updateSystemMetrics, 5000);
 
-function setupMetrics(app) {
-  app.get("/api/metrics", async (req, res) => {
+function setupMetrics(app: any) {
+  app.get("/api/metrics", async (req: any, res: any) => {
     res.set("Content-Type", register.contentType);
     res.end(await register.metrics());
   });

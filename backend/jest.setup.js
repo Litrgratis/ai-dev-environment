@@ -27,6 +27,26 @@ jest.mock('redis', () => ({
   }))
 }));
 
+// Globalny mock ioredis
+jest.mock('ioredis', () => {
+  return jest.fn().mockImplementation(() => ({
+    get: jest.fn(),
+    set: jest.fn(),
+    setex: jest.fn(),
+    del: jest.fn(),
+    expire: jest.fn(),
+    exists: jest.fn(),
+    disconnect: jest.fn(),
+    quit: jest.fn(),
+    on: jest.fn(),
+    once: jest.fn(),
+    emit: jest.fn(),
+    removeListener: jest.fn(),
+    flushall: jest.fn(),
+    ping: jest.fn().mockResolvedValue('PONG'),
+  }));
+});
+
 // Mock dla Gemini API
 jest.mock('@google/generative-ai', () => ({
   GoogleGenerativeAI: jest.fn(() => ({

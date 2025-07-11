@@ -1,11 +1,16 @@
-jest.mock('openai', () => ({
-  Configuration: jest.fn(),
-  OpenAIApi: jest.fn(() => ({
-    createChatCompletion: jest.fn().mockResolvedValue({
-      data: { choices: [{ message: { content: 'mocked openai response' } }] }
-    })
-  }))
-}));
+try {
+  require.resolve('openai');
+  jest.mock('openai', () => ({
+    Configuration: jest.fn(),
+    OpenAIApi: jest.fn(() => ({
+      createChatCompletion: jest.fn().mockResolvedValue({
+        data: { choices: [{ message: { content: 'mocked openai response' } }] }
+      })
+    }))
+  }));
+} catch (e) {
+  // openai module not installed, skip mock
+}
 const { LLMRouter } = require("../../src/llm/router");
 describe("LLMRouter", () => {
   it("routes to Gemini", async () => {

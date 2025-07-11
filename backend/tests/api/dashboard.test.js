@@ -7,9 +7,11 @@ describe("Dashboard API", () => {
     fastify = await buildServer();
   });
 
-  afterAll(async () => {
-    await fastify.close();
-  });
+    const { stopMemoryMonitoring } = require("../../src/monitoring/metricsV2.cjs");
+    afterAll(async () => {
+        stopMemoryMonitoring();
+        await fastify.close();
+    });
 
   it("GET /api/dashboard should return dashboard data", async () => {
     const response = await fastify.inject({

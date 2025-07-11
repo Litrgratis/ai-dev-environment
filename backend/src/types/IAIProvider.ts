@@ -1,4 +1,4 @@
-import { GenerateOptions, GeneratedCode } from "./GeneratedCode";
+import { GenerateOptions, GeneratedCode } from "./GeneratedCode.js";
 
 export interface IAIProvider {
   generateCode(

@@ -1,4 +1,4 @@
-import { GeneratedCode } from "../types/GeneratedCode";
+import { GeneratedCode } from "../types/GeneratedCode.js";
 
 export interface ICodeRepository {
   saveGeneratedCode(code: GeneratedCode): Promise<void>;

@@ -27,11 +27,13 @@ describe("Authentication Protection Tests", () => {
     invalidToken = "invalid.token.here";
   }, 15000);
 
-  afterAll(async () => {
-    if (app) {
-      await app.close();
-    }
-  });
+    const { stopMemoryMonitoring } = require("../../src/monitoring/metricsV2.cjs");
+    afterAll(async () => {
+        stopMemoryMonitoring();
+        if (app) {
+            await app.close();
+        }
+    });
 
   describe("Protected Endpoints Authentication", () => {
     const protectedEndpoints = [

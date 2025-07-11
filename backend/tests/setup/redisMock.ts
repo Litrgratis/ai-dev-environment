@@ -1,4 +1,5 @@
-import { Redis } from "ioredis-mock";
+declare const jest: any;
+import Redis from "ioredis-mock";
 
 jest.mock("ioredis", () => ({
   __esModule: true,

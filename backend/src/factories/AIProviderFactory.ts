@@ -1,7 +1,7 @@
-import { IAIProvider } from "../types/IAIProvider";
-import { GeminiProvider } from "../providers/GeminiProvider";
-import { OpenAIProvider } from "../providers/OpenAIProvider";
-import { ClaudeProvider } from "../providers/ClaudeProvider";
+import { IAIProvider } from "../types/IAIProvider.js";
+import { GeminiProvider } from "../providers/GeminiProvider.js";
+import { OpenAIProvider } from "../providers/OpenAIProvider.js";
+import { ClaudeProvider } from "../providers/ClaudeProvider.js";
 
 export class AIProviderFactory {
   static create(provider: "gemini" | "openai" | "claude"): IAIProvider {

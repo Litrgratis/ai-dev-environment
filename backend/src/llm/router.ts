@@ -1,6 +1,6 @@
-import { GeminiLLM } from "./gemini";
-import { OpenAILLM } from "./openai";
-import { OllamaLLM } from "./ollama";
+import { GeminiLLM } from "./gemini.js";
+import { OpenAILLM } from "./openai.js";
+import { OllamaLLM } from "./ollama.js";
 
 export class LLMRouter {
   private gemini: GeminiLLM;

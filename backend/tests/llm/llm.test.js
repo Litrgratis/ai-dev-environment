@@ -33,13 +33,19 @@ describe("LLM Service Tests", () => {
     GoogleGenerativeAI.mockImplementation(() => mockGenAI);
 
     completionService = new CompletionService();
-  });
-
-  afterEach(async () => {
-    if (completionService && completionService.redis) {
-      await completionService.redis.quit();
+    // Patch redis mock to ensure .on exists
+    if (completionService.redis && typeof completionService.redis.on !== 'function') {
+      completionService.redis.on = jest.fn();
     }
   });
+
+    const { stopMemoryMonitoring } = require("../../src/monitoring/metricsV2.cjs");
+    afterEach(async () => {
+        if (completionService && completionService.redis) {
+            await completionService.redis.quit();
+        }
+        stopMemoryMonitoring();
+    });
 
   describe("AI Suggestions Generation", () => {
     test("should generate suggestions from Gemini API", async () => {
