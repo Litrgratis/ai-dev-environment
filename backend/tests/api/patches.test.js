@@ -1,5 +1,8 @@
 const Fastify = require('fastify');
 const patchRoutes = require('../../src/routes/patches.cjs');
+jest.mock('../../src/services/patchService', () => ({
+  generatePatch: jest.fn(),
+}));
 const patchService = require('../../src/services/patchService');
 
 jest.mock('../../src/services/patchService');
@@ -24,7 +27,7 @@ describe('Patch Routes', () => {
       patch: mockPatch,
       description: 'Patch generated for instruction: "change the log message to "hello patched world""'
     };
-    patchService.generatePatch.mockResolvedValue(mockResponse);
+    jest.spyOn(patchService, 'generatePatch').mockResolvedValue(mockResponse);
 
     const response = await fastify.inject({
       method: 'POST',
@@ -40,7 +43,7 @@ describe('Patch Routes', () => {
   it('should return 500 if patch generation fails', async () => {
     const originalCode = 'console.log("hello world")';
     const instruction = 'a failing instruction';
-    patchService.generatePatch.mockRejectedValue(new Error('AI service failed'));
+    jest.spyOn(patchService, 'generatePatch').mockRejectedValue(new Error('AI service failed'));
 
     const response = await fastify.inject({
       method: 'POST',

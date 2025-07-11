@@ -1,5 +1,5 @@
 /// <reference types="node" />
-const tap = require('tap');
+import tap from 'tap';
 const { createModelServer } = require('./model-serving');
 const nodeFetch = require('node-fetch');
 
@@ -8,7 +8,7 @@ const MODEL_PORT = process.env.MODEL_PORT || '8000';
 const BASE_URL = `http://${MODEL_HOST}:${MODEL_PORT}`;
 
 /** @type {import('fastify').FastifyInstance | undefined} */
-let fastify = undefined;
+let fastify: any = undefined;
 
 tap.before(async () => {
   fastify = createModelServer();
@@ -19,7 +19,7 @@ tap.teardown(async () => {
   if (fastify) await fastify.close();
 });
 
-tap.test('POST /inference returns echo and model info', async (t) => {
+tap.test('POST /inference returns echo and model info', async (t: any) => {
   t.teardown(() => fastify && fastify.close()); // jawne zamknięcie
   const response = await nodeFetch(`${BASE_URL}/inference`, {
     method: 'POST',

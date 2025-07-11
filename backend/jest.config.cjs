@@ -3,21 +3,15 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   extensionsToTreatAsEsm: ['.ts'],
-  moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1'
-  },
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      isolatedModules: true,
-      useESM: true
-    }],
-    '^.+\\.js$': 'babel-jest'
+    '^.+\\.[tj]s$': 'ts-jest'
   },
+  transformIgnorePatterns: [
+    '/node_modules/(?!node-fetch|@google/generative-ai|ioredis-mock|other-esm-deps)/'
+  ],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.cjs'],
   testPathIgnorePatterns: [
     '/node_modules/',
-    '/dist/',
-    'src/pipeline/ai-dev-pipeline.test.js',
-    'src/inference/model-serving.test.js',
-    'server.test.js'
+    '/dist/'
   ]
 };

@@ -1,4 +1,9 @@
 const { CompletionService } = require('../../src/services/completionService.cjs');
+jest.mock('@google/generative-ai', () => {
+  return {
+    GoogleGenerativeAI: jest.fn()
+  };
+});
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 // Mock the Google Generative AI

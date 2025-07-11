@@ -8,6 +8,7 @@ const SecurityMiddleware = require('./middleware');
 const http = require('http');
 const { setupMetrics, metricsInterval } = require('./src/monitoring/metrics');
 const { WebSocketHandler } = require('./src/routes/websocket');
+const generatorCriticRoutes = require('./src/routes/generatorCritic');
 require('dotenv').config();
 
 function createServer() {
@@ -48,6 +49,9 @@ function createServer() {
 
   // Setup security middleware
   SecurityMiddleware.setupSecurity(app);
+
+  // Generator-Critic Pipeline Routes
+  app.use('/pipeline', generatorCriticRoutes);
 
   // Endpoint logowania
   app.post('/api/login', 
