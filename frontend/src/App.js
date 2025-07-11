@@ -1,16 +1,11 @@
 import React from 'react';
 import './App.css';
-import AIChat from './components/AIChat.jsx';
+import IntegratedIDE from './components/IntegratedIDE';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <p>
-          Witaj w Twoim AI-Dev-Environment Frontend!
-        </p>
-      </header>
-      <AIChat />
+      <IntegratedIDE />
     </div>
   );
 }
