@@ -1,7 +1,7 @@
-const { buildServer } = require('../../src/server-fastify.cjs');
-const jwt = require('jsonwebtoken');
+const { buildServer } = require("../../src/server-fastify.cjs");
+const jwt = require("jsonwebtoken");
 
-describe('Authentication Protection Tests', () => {
+describe("Authentication Protection Tests", () => {
   let app;
   let validToken;
   let expiredToken;
@@ -12,21 +12,19 @@ describe('Authentication Protection Tests', () => {
     await app.ready();
 
     // Create test tokens
-    const secret = process.env.JWT_SECRET || 'your-secret-key';
-    
-    validToken = jwt.sign(
-      { id: 1, username: 'user1' },
-      secret,
-      { expiresIn: '1h' }
-    );
+    const secret = process.env.JWT_SECRET || "your-secret-key";
+
+    validToken = jwt.sign({ id: 1, username: "user1" }, secret, {
+      expiresIn: "1h",
+    });
 
     expiredToken = jwt.sign(
-      { id: 1, username: 'user1' },
+      { id: 1, username: "user1" },
       secret,
-      { expiresIn: '-1h' } // Already expired
+      { expiresIn: "-1h" }, // Already expired
     );
 
-    invalidToken = 'invalid.token.here';
+    invalidToken = "invalid.token.here";
   }, 15000);
 
   afterAll(async () => {
@@ -35,22 +33,22 @@ describe('Authentication Protection Tests', () => {
     }
   });
 
-  describe('Protected Endpoints Authentication', () => {
+  describe("Protected Endpoints Authentication", () => {
     const protectedEndpoints = [
-      { method: 'POST', url: '/api/completion' },
-      { method: 'POST', url: '/api/completion/batch' },
-      { method: 'GET', url: '/api/completion/stats' },
-      { method: 'POST', url: '/api/trigger-completion' },
-      { method: 'POST', url: '/api/chat' }
+      { method: "POST", url: "/api/completion" },
+      { method: "POST", url: "/api/completion/batch" },
+      { method: "GET", url: "/api/completion/stats" },
+      { method: "POST", url: "/api/trigger-completion" },
+      { method: "POST", url: "/api/chat" },
     ];
 
     protectedEndpoints.forEach(({ method, url }) => {
       describe(`${method} ${url}`, () => {
-        test('should reject request without token', async () => {
+        test("should reject request without token", async () => {
           const response = await app.inject({
             method,
             url,
-            payload: method !== 'GET' ? { test: 'data' } : undefined
+            payload: method !== "GET" ? { test: "data" } : undefined,
           });
 
           expect(response.statusCode).toBe(401);
@@ -58,44 +56,47 @@ describe('Authentication Protection Tests', () => {
           expect(body.error).toBeDefined();
         });
 
-        test('should reject request with invalid token', async () => {
+        test("should reject request with invalid token", async () => {
           const response = await app.inject({
             method,
             url,
             headers: {
-              authorization: `Bearer ${invalidToken}`
+              authorization: `Bearer ${invalidToken}`,
             },
-            payload: method !== 'GET' ? { test: 'data' } : undefined
+            payload: method !== "GET" ? { test: "data" } : undefined,
           });
 
           expect(response.statusCode).toBe(401);
         });
 
-        test('should reject request with expired token', async () => {
+        test("should reject request with expired token", async () => {
           const response = await app.inject({
             method,
             url,
             headers: {
-              authorization: `Bearer ${expiredToken}`
+              authorization: `Bearer ${expiredToken}`,
             },
-            payload: method !== 'GET' ? { test: 'data' } : undefined
+            payload: method !== "GET" ? { test: "data" } : undefined,
           });
 
           expect(response.statusCode).toBe(401);
         });
 
-        test('should accept request with valid token', async () => {
-          const payload = method !== 'GET' ? {
-            context: { text: 'test.', cursorPosition: 5 }
-          } : undefined;
+        test("should accept request with valid token", async () => {
+          const payload =
+            method !== "GET"
+              ? {
+                  context: { text: "test.", cursorPosition: 5 },
+                }
+              : undefined;
 
           const response = await app.inject({
             method,
             url,
             headers: {
-              authorization: `Bearer ${validToken}`
+              authorization: `Bearer ${validToken}`,
             },
-            payload
+            payload,
           });
 
           // Should not be 401 (may be 400 for invalid payload, but not auth issue)
@@ -105,14 +106,14 @@ describe('Authentication Protection Tests', () => {
     });
   });
 
-  describe('JWT Token Validation', () => {
-    test('should extract user information from valid token', async () => {
+  describe("JWT Token Validation", () => {
+    test("should extract user information from valid token", async () => {
       const response = await app.inject({
-        method: 'GET',
-        url: '/api/completion/stats',
+        method: "GET",
+        url: "/api/completion/stats",
         headers: {
-          authorization: `Bearer ${validToken}`
-        }
+          authorization: `Bearer ${validToken}`,
+        },
       });
 
       expect(response.statusCode).toBe(200);
@@ -120,57 +121,57 @@ describe('Authentication Protection Tests', () => {
       expect(body.user).toBeDefined();
     });
 
-    test('should handle malformed authorization header', async () => {
+    test("should handle malformed authorization header", async () => {
       const response = await app.inject({
-        method: 'GET',
-        url: '/api/completion/stats',
+        method: "GET",
+        url: "/api/completion/stats",
         headers: {
-          authorization: 'InvalidFormat'
-        }
+          authorization: "InvalidFormat",
+        },
       });
 
       expect(response.statusCode).toBe(401);
     });
 
-    test('should handle missing Bearer prefix', async () => {
+    test("should handle missing Bearer prefix", async () => {
       const response = await app.inject({
-        method: 'GET',
-        url: '/api/completion/stats',
+        method: "GET",
+        url: "/api/completion/stats",
         headers: {
-          authorization: validToken // Missing "Bearer "
-        }
+          authorization: validToken, // Missing "Bearer "
+        },
       });
 
       expect(response.statusCode).toBe(401);
     });
   });
 
-  describe('Login Endpoint Security', () => {
-    test('should return token on valid credentials', async () => {
+  describe("Login Endpoint Security", () => {
+    test("should return token on valid credentials", async () => {
       const response = await app.inject({
-        method: 'POST',
-        url: '/api/login',
+        method: "POST",
+        url: "/api/login",
         payload: {
-          username: 'user1',
-          password: 'password123'
-        }
+          username: "user1",
+          password: "password123",
+        },
       });
 
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
       expect(body.token).toBeDefined();
       expect(body.user).toBeDefined();
-      expect(body.user.username).toBe('user1');
+      expect(body.user.username).toBe("user1");
     });
 
-    test('should reject invalid credentials', async () => {
+    test("should reject invalid credentials", async () => {
       const response = await app.inject({
-        method: 'POST',
-        url: '/api/login',
+        method: "POST",
+        url: "/api/login",
         payload: {
-          username: 'user1',
-          password: 'wrongpassword'
-        }
+          username: "user1",
+          password: "wrongpassword",
+        },
       });
 
       expect(response.statusCode).toBe(401);
@@ -179,38 +180,38 @@ describe('Authentication Protection Tests', () => {
       expect(body.token).toBeUndefined();
     });
 
-    test('should reject missing credentials', async () => {
+    test("should reject missing credentials", async () => {
       const response = await app.inject({
-        method: 'POST',
-        url: '/api/login',
+        method: "POST",
+        url: "/api/login",
         payload: {
-          username: 'user1'
+          username: "user1",
           // Missing password
-        }
+        },
       });
 
       expect(response.statusCode).toBe(400);
     });
 
-    test('should reject non-existent user', async () => {
+    test("should reject non-existent user", async () => {
       const response = await app.inject({
-        method: 'POST',
-        url: '/api/login',
+        method: "POST",
+        url: "/api/login",
         payload: {
-          username: 'nonexistent',
-          password: 'password123'
-        }
+          username: "nonexistent",
+          password: "password123",
+        },
       });
 
       expect(response.statusCode).toBe(401);
     });
   });
 
-  describe('Rate Limiting & Security Headers', () => {
-    test('should include security headers', async () => {
+  describe("Rate Limiting & Security Headers", () => {
+    test("should include security headers", async () => {
       const response = await app.inject({
-        method: 'GET',
-        url: '/health'
+        method: "GET",
+        url: "/health",
       });
 
       // Check for basic security headers (if implemented)
@@ -218,45 +219,47 @@ describe('Authentication Protection Tests', () => {
       expect(response.statusCode).toBe(200);
     });
 
-    test('should handle rapid requests gracefully', async () => {
-      const requests = Array(10).fill().map(() =>
-        app.inject({
-          method: 'POST',
-          url: '/api/login',
-          payload: {
-            username: 'user1',
-            password: 'password123'
-          }
-        })
-      );
+    test("should handle rapid requests gracefully", async () => {
+      const requests = Array(10)
+        .fill()
+        .map(() =>
+          app.inject({
+            method: "POST",
+            url: "/api/login",
+            payload: {
+              username: "user1",
+              password: "password123",
+            },
+          }),
+        );
 
       const responses = await Promise.all(requests);
-      
+
       // All should succeed (no rate limiting implemented yet)
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect([200, 429]).toContain(response.statusCode); // 429 if rate limiting enabled
       });
     });
   });
 
-  describe('Token Lifecycle', () => {
-    test('should generate different tokens for each login', async () => {
+  describe("Token Lifecycle", () => {
+    test("should generate different tokens for each login", async () => {
       const response1 = await app.inject({
-        method: 'POST',
-        url: '/api/login',
+        method: "POST",
+        url: "/api/login",
         payload: {
-          username: 'user1',
-          password: 'password123'
-        }
+          username: "user1",
+          password: "password123",
+        },
       });
 
       const response2 = await app.inject({
-        method: 'POST',
-        url: '/api/login',
+        method: "POST",
+        url: "/api/login",
         payload: {
-          username: 'user1',
-          password: 'password123'
-        }
+          username: "user1",
+          password: "password123",
+        },
       });
 
       const token1 = JSON.parse(response1.body).token;
@@ -265,19 +268,19 @@ describe('Authentication Protection Tests', () => {
       expect(token1).not.toBe(token2);
     });
 
-    test('should validate token structure', async () => {
+    test("should validate token structure", async () => {
       const response = await app.inject({
-        method: 'POST',
-        url: '/api/login',
+        method: "POST",
+        url: "/api/login",
         payload: {
-          username: 'user1',
-          password: 'password123'
-        }
+          username: "user1",
+          password: "password123",
+        },
       });
 
       const token = JSON.parse(response.body).token;
-      const parts = token.split('.');
-      
+      const parts = token.split(".");
+
       // JWT should have 3 parts: header.payload.signature
       expect(parts).toHaveLength(3);
     });

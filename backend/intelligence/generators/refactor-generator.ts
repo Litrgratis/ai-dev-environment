@@ -1,4 +1,4 @@
 export function generateRefactorings(code: string) {
-    // Suggest or generate code refactorings
-    // ...refactor generation logic...
+  // Suggest or generate code refactorings
+  // ...refactor generation logic...
 }

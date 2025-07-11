@@ -1,7 +1,7 @@
-import { Redis } from 'ioredis-mock';
+import { Redis } from "ioredis-mock";
 
-jest.mock('ioredis', () => ({
+jest.mock("ioredis", () => ({
   __esModule: true,
   default: Redis,
-  Redis
+  Redis,
 }));

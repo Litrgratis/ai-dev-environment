@@ -1,4 +1,4 @@
-const { DashboardService } = require('../services/dashboardService.cjs');
+const { DashboardService } = require("../services/dashboardService.cjs");
 
 class DashboardController {
   constructor() {
@@ -15,18 +15,20 @@ class DashboardController {
       const data = await this.dashboardService.getDashboardData();
       reply.send(data);
     } catch (error) {
-      req.log.error('Error fetching dashboard data:', error);
-      reply.status(500).send({ error: 'Failed to fetch dashboard data' });
+      req.log.error("Error fetching dashboard data:", error);
+      reply.status(500).send({ error: "Failed to fetch dashboard data" });
     }
   }
 
   async getAnalytics(req, reply) {
     try {
-      const data = await this.dashboardService.getAnalytics(req.query.timeRange);
+      const data = await this.dashboardService.getAnalytics(
+        req.query.timeRange,
+      );
       reply.send(data);
     } catch (error) {
-      req.log.error('Error fetching analytics data:', error);
-      reply.status(500).send({ error: 'Failed to fetch analytics data' });
+      req.log.error("Error fetching analytics data:", error);
+      reply.status(500).send({ error: "Failed to fetch analytics data" });
     }
   }
 
@@ -35,24 +37,28 @@ class DashboardController {
       const files = await this.dashboardService.listLlmOutputFiles();
       reply.send(files);
     } catch (error) {
-      req.log.error('Error listing LLM output files:', error);
-      reply.status(500).send({ error: 'Failed to list LLM output files' });
+      req.log.error("Error listing LLM output files:", error);
+      reply.status(500).send({ error: "Failed to list LLM output files" });
     }
   }
 
   async viewLlmOutputFile(req, reply) {
     try {
       const { filename } = req.params;
-      const content = await this.dashboardService.getLlmOutputFileContent(filename);
+      const content =
+        await this.dashboardService.getLlmOutputFileContent(filename);
       if (content === null) {
-        return reply.status(404).send({ error: 'File not found' });
+        return reply.status(404).send({ error: "File not found" });
       }
       // For security, we'll return the content as JSON.
       // The frontend can then decide how to render it.
       reply.send({ filename, content });
     } catch (error) {
-      req.log.error(`Error viewing LLM output file ${req.params.filename}:`, error);
-      reply.status(500).send({ error: 'Failed to view LLM output file' });
+      req.log.error(
+        `Error viewing LLM output file ${req.params.filename}:`,
+        error,
+      );
+      reply.status(500).send({ error: "Failed to view LLM output file" });
     }
   }
 }
@@ -60,10 +66,13 @@ class DashboardController {
 async function dashboardRoutes(fastify, options) {
   const dashboardController = new DashboardController();
 
-  fastify.get('/', dashboardController.getDashboardData);
-  fastify.get('/analytics', dashboardController.getAnalytics);
-  fastify.get('/llm-output', dashboardController.listLlmOutput);
-  fastify.get('/llm-output/view/:filename', dashboardController.viewLlmOutputFile);
+  fastify.get("/", dashboardController.getDashboardData);
+  fastify.get("/analytics", dashboardController.getAnalytics);
+  fastify.get("/llm-output", dashboardController.listLlmOutput);
+  fastify.get(
+    "/llm-output/view/:filename",
+    dashboardController.viewLlmOutputFile,
+  );
 }
 
 module.exports = { dashboardRoutes, DashboardController };

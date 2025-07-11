@@ -1,9 +1,9 @@
-import { routeModel } from './model-router';
-import { manageContext } from './context-manager';
-import { handleFallback } from './fallback-handler';
+import { routeModel } from "./model-router";
+import { manageContext } from "./context-manager";
+import { handleFallback } from "./fallback-handler";
 
 export default {
-    routeModel,
-    manageContext,
-    handleFallback,
+  routeModel,
+  manageContext,
+  handleFallback,
 };

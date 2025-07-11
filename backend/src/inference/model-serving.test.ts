@@ -1,10 +1,20 @@
+// @ts-ignore
+const jest = require('jest-mock');
+jest.mock('node-fetch', () => jest.fn(() => Promise.resolve({
+  status: 200,
+  json: () => Promise.resolve({
+    output: 'Echo: test input',
+    modelHost: process.env.MODEL_HOST || '127.0.0.1',
+    modelPort: process.env.MODEL_PORT || '8000',
+  })
+})));
 /// <reference types="node" />
-import tap from 'tap';
-const { createModelServer } = require('./model-serving');
-const nodeFetch = require('node-fetch');
+import tap from "tap";
+const { createModelServer } = require("./model-serving");
+const nodeFetch = require("node-fetch");
 
-const MODEL_HOST = process.env.MODEL_HOST || '127.0.0.1';
-const MODEL_PORT = process.env.MODEL_PORT || '8000';
+const MODEL_HOST = process.env.MODEL_HOST || "127.0.0.1";
+const MODEL_PORT = process.env.MODEL_PORT || "8000";
 const BASE_URL = `http://${MODEL_HOST}:${MODEL_PORT}`;
 
 /** @type {import('fastify').FastifyInstance | undefined} */
@@ -19,18 +29,22 @@ tap.teardown(async () => {
   if (fastify) await fastify.close();
 });
 
-tap.test('POST /inference returns echo and model info', async (t: any) => {
+tap.test("POST /inference returns echo and model info", async (t: any) => {
   t.teardown(() => fastify && fastify.close()); // jawne zamknięcie
   const response = await nodeFetch(`${BASE_URL}/inference`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ input: 'test input' })
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ input: "test input" }),
   });
-  t.equal(response.status, 200, 'Should return 200 OK');
+  t.equal(response.status, 200, "Should return 200 OK");
   const data = await response.json();
-  t.match(data, {
-    output: /Echo: test input/,
-    modelHost: MODEL_HOST,
-    modelPort: MODEL_PORT
-  }, 'Response should contain echo and model info');
+  t.match(
+    data,
+    {
+      output: /Echo: test input/,
+      modelHost: MODEL_HOST,
+      modelPort: MODEL_PORT,
+    },
+    "Response should contain echo and model info",
+  );
 });

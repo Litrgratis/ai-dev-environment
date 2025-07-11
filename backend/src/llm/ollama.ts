@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 export class OllamaLLM {
   private baseUrl: string;
@@ -6,11 +6,11 @@ export class OllamaLLM {
     this.baseUrl = baseUrl;
   }
 
-  async generate(prompt: string, model: string = 'llama3') {
+  async generate(prompt: string, model: string = "llama3") {
     const response = await axios.post(`${this.baseUrl}/api/generate`, {
       model,
       prompt,
-      stream: false
+      stream: false,
     });
     return response.data.response;
   }

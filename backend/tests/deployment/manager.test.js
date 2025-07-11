@@ -1,18 +1,20 @@
-const { DeploymentManager } = require('../../src/deployment/manager');
-const { describe, it, expect } = require('@jest/globals');
+const { DeploymentManager } = require("../../src/deployment/manager");
+const { describe, it, expect } = require("@jest/globals");
 
-describe('DeploymentManager', () => {
-  it('deploys successfully', async () => {
+describe("DeploymentManager", () => {
+  it("deploys successfully", async () => {
     const manager = new DeploymentManager();
-    jest.spyOn(manager, 'deploy').mockResolvedValue({ status: 'success' });
+    jest.spyOn(manager, "deploy").mockResolvedValue({ status: "success" });
     const result = await manager.deploy();
-    expect(result.status).toBe('success');
+    expect(result.status).toBe("success");
   });
-  it('rolls back on failure', async () => {
+  it("rolls back on failure", async () => {
     const manager = new DeploymentManager();
-    jest.spyOn(manager, 'rollback').mockResolvedValue({ status: 'rolled_back' });
+    jest
+      .spyOn(manager, "rollback")
+      .mockResolvedValue({ status: "rolled_back" });
     const result = await manager.rollback();
-    expect(result.status).toBe('rolled_back');
+    expect(result.status).toBe("rolled_back");
   });
   // Dodaj więcej testów edge-case
 });

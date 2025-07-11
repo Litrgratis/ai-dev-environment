@@ -1,16 +1,16 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 class CodeAnalyzer {
   constructor(apiKey) {
     this.genAI = new GoogleGenerativeAI(apiKey);
-    this.model = this.genAI.getGenerativeModel({ 
-      model: 'gemini-pro',
+    this.model = this.genAI.getGenerativeModel({
+      model: "gemini-pro",
       generationConfig: {
         temperature: 0.3,
         topK: 40,
         topP: 0.95,
         maxOutputTokens: 256,
-      }
+      },
     });
   }
 
@@ -20,11 +20,11 @@ class CodeAnalyzer {
       const result = await this.model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
-      
+
       return this.parseCompletionResponse(text);
     } catch (error) {
-      console.error('[Gemini] API error:', error);
-      throw new Error('Gemini API request failed');
+      console.error("[Gemini] API error:", error);
+      throw new Error("Gemini API request failed");
     }
   }
 
@@ -36,7 +36,7 @@ class CodeAnalyzer {
     return `
 You are a ${language} code completion assistant. Analyze the following code context and provide 4-6 most relevant completion suggestions.
 
-File: ${fileName || 'unknown'}
+File: ${fileName || "unknown"}
 Language: ${language}
 
 Code before cursor:
@@ -65,16 +65,15 @@ Example output:
         const suggestions = JSON.parse(jsonMatch[0]);
         return Array.isArray(suggestions) ? suggestions.slice(0, 6) : [];
       }
-      
+
       // Fallback: split by lines and clean
       return response
-        .split('\n')
-        .map(line => line.trim().replace(/['"`,]/g, ''))
-        .filter(line => line.length > 0 && line.length < 50)
+        .split("\n")
+        .map((line) => line.trim().replace(/['"`,]/g, ""))
+        .filter((line) => line.length > 0 && line.length < 50)
         .slice(0, 6);
-        
     } catch (error) {
-      console.error('[Gemini] Failed to parse response:', error);
+      console.error("[Gemini] Failed to parse response:", error);
       return [];
     }
   }
@@ -82,7 +81,7 @@ Example output:
   // FP-16 optimization for faster inference
   async optimizedGenerate(context, language) {
     const suggestions = await this.analyzeContext(context, language);
-    
+
     // Sort by relevance using simple heuristics
     const sorted = suggestions.sort((a, b) => {
       const aScore = this.calculateRelevanceScore(a, context);
@@ -95,17 +94,19 @@ Example output:
 
   calculateRelevanceScore(suggestion, context) {
     let score = 0;
-    const beforeCursor = context.text.substring(0, context.cursorPosition).toLowerCase();
-    
+    const beforeCursor = context.text
+      .substring(0, context.cursorPosition)
+      .toLowerCase();
+
     // Bonus for matching current typing
     if (beforeCursor.endsWith(suggestion.toLowerCase().substring(0, 2))) {
       score += 10;
     }
-    
+
     // Bonus for common patterns
-    if (suggestion.includes('()')) score += 5; // Methods
+    if (suggestion.includes("()")) score += 5; // Methods
     if (suggestion.match(/^[a-z][A-Z]/)) score += 3; // camelCase
-    
+
     return score;
   }
 }

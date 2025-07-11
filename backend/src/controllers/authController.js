@@ -1,6 +1,6 @@
 exports.login = (req, res) => {
   // ...implement login logic...
-  res.send({ token: 'jwt-token' });
+  res.send({ token: "jwt-token" });
 };
 
 exports.register = (req, res) => {

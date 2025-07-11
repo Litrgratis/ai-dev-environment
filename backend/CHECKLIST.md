@@ -1,0 +1,13 @@
+- [ ] Audyt kodu i linting
+- [ ] Pokrycie testami
+- [ ] Konfiguracja środowiska
+- [ ] Przygotowanie .env i .gitignore
+- [ ] Tworzenie dokumentacji
+- [ ] Testowanie Docker
+- [ ] Infrastruktura Terraform
+- [ ] Struktura katalogów AI
+- [ ] Git LFS
+- [ ] Rollback plan
+- [ ] MVP komponent AI
+- [ ] Zapis stanu początkowego
+- [ ] CI GitHub Actions

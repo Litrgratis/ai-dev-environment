@@ -1,15 +1,18 @@
-const fs = require('fs').promises;
-const path = require('path');
-const { metricsHelpers, getHealthStatus } = require('../monitoring/metricsV2.cjs');
+const fs = require("fs").promises;
+const path = require("path");
+const {
+  metricsHelpers,
+  getHealthStatus,
+} = require("../monitoring/metricsV2.cjs");
 
-const LLM_OUTPUT_DIR = path.join(__dirname, '../../../llm-output');
+const LLM_OUTPUT_DIR = path.join(__dirname, "../../../llm-output");
 
 class DashboardService {
   constructor() {
     this.systemStats = {
       startTime: Date.now(),
       requests: 0,
-      errors: 0
+      errors: 0,
     };
   }
 
@@ -17,25 +20,25 @@ class DashboardService {
   async getDashboardData() {
     const health = getHealthStatus();
     const metrics = metricsHelpers.getCacheStats();
-    
+
     return {
       system: {
         ...health,
         requests: this.systemStats.requests,
         errors: this.systemStats.errors,
-        uptime: Date.now() - this.systemStats.startTime
+        uptime: Date.now() - this.systemStats.startTime,
       },
       cache: metrics,
       performance: {
-        avgLatency: '~300ms', // Mock for now
-        throughput: '50 req/s' // Mock for now
+        avgLatency: "~300ms", // Mock for now
+        throughput: "50 req/s", // Mock for now
       },
       components: {
-        fastify: 'healthy',
-        redis: 'healthy',
-        gemini: 'healthy',
-        websocket: 'active'
-      }
+        fastify: "healthy",
+        redis: "healthy",
+        gemini: "healthy",
+        websocket: "active",
+      },
     };
   }
 
@@ -63,10 +66,10 @@ class DashboardService {
     }
 
     try {
-      const content = await fs.readFile(filePath, 'utf-8');
+      const content = await fs.readFile(filePath, "utf-8");
       return content;
     } catch (error) {
-      if (error.code === 'ENOENT') {
+      if (error.code === "ENOENT") {
         return null;
       }
       throw error;
@@ -91,20 +94,20 @@ class DashboardService {
   }
 
   // Analytics data for dashboard charts
-  async getAnalytics(timeRange = '24h') {
+  async getAnalytics(timeRange = "24h") {
     return {
       completions: {
-        labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
-        data: [12, 19, 15, 32, 28, 41] // Mock data
+        labels: ["00:00", "04:00", "08:00", "12:00", "16:00", "20:00"],
+        data: [12, 19, 15, 32, 28, 41], // Mock data
       },
       latency: {
-        labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
-        data: [245, 312, 198, 287, 334, 298] // Mock data in ms
+        labels: ["00:00", "04:00", "08:00", "12:00", "16:00", "20:00"],
+        data: [245, 312, 198, 287, 334, 298], // Mock data in ms
       },
       cacheHitRate: {
-        labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
-        data: [85, 78, 92, 88, 91, 87] // Mock data in %
-      }
+        labels: ["00:00", "04:00", "08:00", "12:00", "16:00", "20:00"],
+        data: [85, 78, 92, 88, 91, 87], // Mock data in %
+      },
     };
   }
 }

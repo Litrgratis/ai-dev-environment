@@ -1,7 +1,7 @@
-import { CodeGenerator } from '../core/generator';
-import { CodeCritic } from '../core/critic';
+import { CodeGenerator } from "../core/generator";
+import { CodeCritic } from "../core/critic";
 
-export type SupportedLanguage = 'javascript' | 'python' | 'java';
+export type SupportedLanguage = "javascript" | "python" | "java";
 
 export interface GeneratorCriticIteration {
   code: string;
@@ -16,15 +16,18 @@ export interface GeneratorCriticResult {
 }
 
 export class AIDevPipeline {
-  constructor(private generator: CodeGenerator, private critic: CodeCritic) {}
+  constructor(
+    private generator: CodeGenerator,
+    private critic: CodeCritic,
+  ) {}
 
   async run(
     prompt: string,
     language: SupportedLanguage,
-    maxIterations: number = 3
+    maxIterations: number = 3,
   ): Promise<GeneratorCriticResult> {
-    if (!['javascript', 'python', 'java'].includes(language)) {
-      throw new Error('Unsupported language. Use javascript, python, or java.');
+    if (!["javascript", "python", "java"].includes(language)) {
+      throw new Error("Unsupported language. Use javascript, python, or java.");
     }
     let code = await this.generator.generate(prompt, language);
     const iterations: GeneratorCriticIteration[] = [];
@@ -34,14 +37,18 @@ export class AIDevPipeline {
         code: code.code,
         feedback,
         language,
-        iteration: i + 1
+        iteration: i + 1,
       });
-      if (!feedback.toLowerCase().includes('error') && !feedback.toLowerCase().includes('błąd')) break;
+      if (
+        !feedback.toLowerCase().includes("error") &&
+        !feedback.toLowerCase().includes("błąd")
+      )
+        break;
       code = await this.generator.improve(code.code, feedback);
     }
     return {
       finalCode: code.code,
-      iterations
+      iterations,
     };
   }
 }

@@ -1,4 +1,4 @@
 export function optimizePerformance(code: string) {
-    // Suggest or apply performance optimizations
-    // ...performance optimization logic...
+  // Suggest or apply performance optimizations
+  // ...performance optimization logic...
 }
