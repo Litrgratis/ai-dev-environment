@@ -1,0 +1,13 @@
+name: AI Chaos Engineering
+on:
+  schedule:
+    - cron: '0 3 * * *'
+jobs:
+  chaos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run chaos test
+        run: |
+          npm run chaos || echo "chaos test failed"

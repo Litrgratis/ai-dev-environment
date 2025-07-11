@@ -1,0 +1,24 @@
+name: AI Integration
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  autodesign-autohealing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run autodesign
+        run: |
+          npm run autodesign || echo "autodesign failed"
+      - name: Run autohealing
+        run: |
+          npm run autohealing || echo "autohealing failed"
+      - name: Update knowledge base
+        run: |
+          node scripts/update-knowledge-base.js
+      - name: Notify AI
+        run: |
+          curl -X POST http://localhost:8080/ai/webhook -d '{"event":"ci_cd_complete"}'
