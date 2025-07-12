@@ -13,7 +13,22 @@ class OllamaService {
     });
   }
 
+  // Simple circuit-breaker state
+  #failCount = 0;
+  #breakerOpen = false;
+  #breakerTimeout = null;
+  #MAX_FAILS = 3;
+  #RESET_TIMEOUT = 15000; // ms
+
   async generateCode(prompt, model = 'codellama', options = {}) {
+    if (this.#breakerOpen) {
+      return {
+        success: false,
+        error: 'Circuit breaker open: too many failures',
+        provider: 'ollama',
+        breaker: true
+      };
+    }
     const payload = {
       model: config.models[model] || config.models.codellama,
       prompt: prompt,
@@ -24,22 +39,44 @@ class OllamaService {
         num_predict: options.max_tokens || 2048
       }
     };
-
-    try {
-      const response = await this.client.post('/api/generate', payload);
-      return {
-        success: true,
-        data: response.data,
-        provider: 'ollama',
-        model: payload.model
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error.message,
-        provider: 'ollama'
-      };
+    // Exponential backoff retry
+    const maxRetries = 5;
+    let attempt = 0;
+    let lastError = null;
+    while (attempt < maxRetries) {
+      try {
+        const response = await this.client.post('/api/generate', payload);
+        this.#failCount = 0;
+        return {
+          success: true,
+          data: response.data,
+          provider: 'ollama',
+          model: payload.model
+        };
+      } catch (error) {
+        lastError = error;
+        this.#failCount++;
+        if (this.#failCount >= this.#MAX_FAILS) {
+          this.#breakerOpen = true;
+          if (!this.#breakerTimeout) {
+            this.#breakerTimeout = setTimeout(() => {
+              this.#breakerOpen = false;
+              this.#failCount = 0;
+              this.#breakerTimeout = null;
+            }, this.#RESET_TIMEOUT);
+          }
+        }
+        // Exponential backoff
+        await new Promise(res => setTimeout(res, Math.pow(2, attempt) * 200));
+        attempt++;
+      }
     }
+    return {
+      success: false,
+      error: lastError ? lastError.message : 'Unknown error',
+      provider: 'ollama',
+      breaker: this.#breakerOpen
+    };
   }
 
   async chatComplete(messages, model = 'llama3', options = {}) {

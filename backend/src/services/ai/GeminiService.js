@@ -14,7 +14,22 @@ class GeminiService {
     });
   }
 
+  // Simple circuit-breaker state
+  #failCount = 0;
+  #breakerOpen = false;
+  #breakerTimeout = null;
+  #MAX_FAILS = 3;
+  #RESET_TIMEOUT = 15000; // ms
+
   async generateCode(prompt, model = 'gemini-pro', options = {}) {
+    if (this.#breakerOpen) {
+      return {
+        success: false,
+        error: 'Circuit breaker open: too many failures',
+        provider: 'gemini',
+        breaker: true
+      };
+    }
     const payload = {
       contents: [{
         parts: [{
@@ -27,13 +42,12 @@ class GeminiService {
         maxOutputTokens: options.max_tokens || 2048
       }
     };
-
     try {
       const response = await this.client.post(
         `/models/${config.models[model] || config.models['gemini-pro']}:generateContent?key=${this.apiKey}`,
         payload
       );
-      
+      this.#failCount = 0;
       return {
         success: true,
         data: response.data,
@@ -41,10 +55,22 @@ class GeminiService {
         model: model
       };
     } catch (error) {
+      this.#failCount++;
+      if (this.#failCount >= this.#MAX_FAILS) {
+        this.#breakerOpen = true;
+        if (!this.#breakerTimeout) {
+          this.#breakerTimeout = setTimeout(() => {
+            this.#breakerOpen = false;
+            this.#failCount = 0;
+            this.#breakerTimeout = null;
+          }, this.#RESET_TIMEOUT);
+        }
+      }
       return {
         success: false,
         error: error.message,
-        provider: 'gemini'
+        provider: 'gemini',
+        breaker: this.#breakerOpen
       };
     }
   }

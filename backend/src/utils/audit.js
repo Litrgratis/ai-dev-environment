@@ -1,4 +1,4 @@
-// Simple audit module with local logging and optional email notification
+// Simple audit module with local logging, optional email notification, and template loader
 // To enable email, set AUDIT_EMAIL_ENABLED=true and configure SMTP below
 
 const fs = require('fs');
@@ -40,4 +40,28 @@ function logAudit(action, details = {}) {
   }
 }
 
-module.exports = { logAudit };
+// Dynamic template loader with validation
+function loadTemplate(templateName) {
+  const templatesDir = path.join(__dirname, '../../config/prompt-templates');
+  const filePath = path.join(templatesDir, `${templateName}.json`);
+  if (!fs.existsSync(filePath)) {
+    logAudit('template_load_failed', { templateName, error: 'Template not found' });
+    throw new Error('Template not found');
+  }
+  try {
+    const raw = fs.readFileSync(filePath, 'utf8');
+    const template = JSON.parse(raw);
+    // Simple validation: must have 'prompt' and 'description'
+    if (!template.prompt || !template.description) {
+      logAudit('template_validation_failed', { templateName, error: 'Missing required fields' });
+      throw new Error('Invalid template format');
+    }
+    logAudit('template_loaded', { templateName });
+    return template;
+  } catch (err) {
+    logAudit('template_load_failed', { templateName, error: err.message });
+    throw err;
+  }
+}
+
+module.exports = { logAudit, loadTemplate };

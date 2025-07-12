@@ -1,4 +1,5 @@
 const AIProviderManager = require('../../services/ai/AIProviderManager');
+const { buildCodePrompt, extractCode, extractChatResponse } = require('../../utils/codeUtils');
 
 class CodeGenerationController {
   constructor() {
@@ -120,36 +121,18 @@ class CodeGenerationController {
     }
   }
 
+  // ...existing code...
+  // Refactored: use codeUtils for prompt and extraction
   buildCodePrompt(prompt, framework, style) {
-    let enhancedPrompt = `Generate ${framework || 'JavaScript'} code with ${style || 'modern'} style.\n\n`;
-    enhancedPrompt += `Requirements: ${prompt}\n\n`;
-    enhancedPrompt += `Please provide clean, well-commented code that follows best practices.`;
-    
-    return enhancedPrompt;
+    return buildCodePrompt(prompt, framework, style);
   }
 
   extractCode(data) {
-    if (data.response) {
-      return data.response;
-    }
-    
-    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-      return data.candidates[0].content.parts[0].text;
-    }
-    
-    return data;
+    return extractCode(data);
   }
 
   extractChatResponse(data) {
-    if (data.message && data.message.content) {
-      return data.message.content;
-    }
-    
-    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-      return data.candidates[0].content.parts[0].text;
-    }
-    
-    return data;
+    return extractChatResponse(data);
   }
 }
 

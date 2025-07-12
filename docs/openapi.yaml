@@ -1,0 +1,131 @@
+openapi: 3.0.3
+info:
+  title: AI Development Environment API
+  version: 1.0.0
+  description: >
+    API for code generation, model serving, authentication, dashboard, and analytics.
+servers:
+  - url: http://localhost:8000
+paths:
+  /api/completion:
+    post:
+      summary: Generate code completion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prompt:
+                  type: string
+                language:
+                  type: string
+                context:
+                  type: string
+                maxIterations:
+                  type: integer
+                includeComments:
+                  type: boolean
+      responses:
+        '200':
+          description: Completion result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                  error:
+                    type: string
+  /api/ollama/generate:
+    post:
+      summary: Generate code using Ollama model
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prompt:
+                  type: string
+                model:
+                  type: string
+      responses:
+        '200':
+          description: Ollama generation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  output:
+                    type: string
+                  model:
+                    type: string
+  /api/token/refresh:
+    post:
+      summary: Refresh JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: New access token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+        '401':
+          description: Invalid token
+  /inference:
+    get:
+      summary: Get model info
+      responses:
+        '200':
+          description: Model info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  model:
+                    type: string
+                  status:
+                    type: string
+    post:
+      summary: Generate code via inference
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prompt:
+                  type: string
+                language:
+                  type: string
+      responses:
+        '200':
+          description: Inference result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  completion:
+                    type: string
