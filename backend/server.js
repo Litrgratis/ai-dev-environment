@@ -16,25 +16,33 @@ function createServer() {
   app.use(express.json());
   app.use(cors());
 
-  // Prosta baza użytkowników w pamięci (w produkcji użyj bazy danych)
-  const users = [
-    { id: 1, username: "user1", password: bcrypt.hashSync("password123", 10) },
-  ];
+
+  // Obsługa użytkowników przez PostgreSQL
+  const db = require("./src/services/db");
+
+  async function findUserByUsername(username) {
+    const result = await db.query("SELECT * FROM users WHERE username = $1", [username]);
+    return result.rows[0];
+  }
 
   // Middleware do weryfikacji tokenu JWT
-  const authenticateToken = (req, res, next) => {
+  const authenticateToken = async (req, res, next) => {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
     if (!token)
       return res.status(401).json({ error: "Brak tokenu autoryzacyjnego" });
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err)
-        return res
-          .status(401)
-          .json({ error: "Nieprawidłowy lub wygasły token" });
-      req.user = user;
+    try {
+      const payload = jwt.verify(token, process.env.JWT_SECRET);
+      // Pobierz usera z bazy na podstawie userId
+      const user = await findUserByUsername(payload.username);
+      if (!user) {
+        return res.status(401).json({ error: "Użytkownik nie istnieje" });
+      }
+      req.user = { userId: user.id, username: user.username };
       next();
-    });
+    } catch (err) {
+      return res.status(401).json({ error: "Nieprawidłowy lub wygasły token" });
+    }
   };
 
   // Inicjalizacja Gemini
@@ -66,8 +74,8 @@ function createServer() {
     SecurityMiddleware.auditLog,
     async (req, res) => {
       const { username, password } = req.body;
-      const user = users.find((u) => u.username === username);
-      if (!user || !(await bcrypt.compare(password, user.password))) {
+      const user = await findUserByUsername(username);
+      if (!user || !(await bcrypt.compare(password, user.password_hash))) {
         return res
           .status(401)
           .json({ error: "Nieprawidłowa nazwa użytkownika lub hasło" });
@@ -77,10 +85,41 @@ function createServer() {
         process.env.JWT_SECRET,
         { expiresIn: "1h" },
       );
-      res.json({ token });
+      // Add refresh token
+      const refreshToken = jwt.sign(
+        { userId: user.id, username: user.username },
+        process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
+        { expiresIn: "7d" },
+      );
+      res.json({ accessToken: token, refreshToken });
     },
   );
 
+  // Endpoint for JWT refresh
+  app.post("/api/token/refresh", async (req, res) => {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      return res.status(401).json({ error: "Brak refresh tokenu" });
+    }
+    try {
+      const payload = jwt.verify(
+        refreshToken,
+        process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET
+      );
+      const user = await findUserByUsername(payload.username);
+      if (!user) {
+        return res.status(401).json({ error: "Użytkownik nie istnieje" });
+      }
+      const newAccessToken = jwt.sign(
+        { userId: user.id, username: user.username },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" },
+      );
+      res.json({ accessToken: newAccessToken });
+    } catch (err) {
+      return res.status(401).json({ error: "Invalid refresh token" });
+    }
+  });
   // Endpoint generowania kodu
   app.post(
     "/api/generate-code",
@@ -121,6 +160,28 @@ function createServer() {
     },
   );
 
+  // Endpoint generowania kodu przez Ollama
+  const OllamaService = require("./src/services/ai/OllamaService");
+  const ollamaService = new OllamaService();
+  app.post("/api/ollama/generate", authenticateToken, async (req, res) => {
+    try {
+      const { prompt, model = "llama2", options = {} } = req.body;
+      const result = await ollamaService.generateCode(prompt, model, options);
+      if (result.success) {
+        res.json({
+          success: true,
+          model: result.model,
+          prompt,
+          output: result.data.output || result.data,
+        });
+      } else {
+        res.status(500).json({ error: result.error || "Błąd generowania kodu przez Ollama." });
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message || "Błąd serwera podczas generowania kodu przez Ollama." });
+    }
+  });
+
   // Endpoint do pobierania głównego pliku
   app.post("/api/get-main-file", authenticateToken, async (req, res) => {
     try {
@@ -133,9 +194,7 @@ function createServer() {
       const generatedCode = response.text();
       res.json({ generatedCode });
     } catch (error) {
-      res
-        .status(500)
-        .json({ error: "Błąd serwera podczas pobierania głównego pliku." });
+      res.status(500).json({ error: error.message || "Błąd serwera podczas pobierania głównego pliku." });
     }
   });
 
@@ -159,9 +218,7 @@ function createServer() {
         const text = response.text();
         res.json({ response: text });
       } catch (error) {
-        res
-          .status(500)
-          .json({ error: "Błąd serwera podczas przetwarzania czatu AI." });
+        res.status(500).json({ error: error.message || "Błąd serwera podczas przetwarzania czatu AI." });
       }
     },
   );

@@ -52,8 +52,16 @@ class DashboardService {
   }
 
   async listLlmOutputFiles() {
-    const files = await this.walkDir(LLM_OUTPUT_DIR);
-    return files;
+    try {
+      const files = await this.walkDir(LLM_OUTPUT_DIR);
+      return files;
+    } catch (error) {
+      // If directory does not exist, return empty array
+      if (error.code === "ENOENT") {
+        return [];
+      }
+      throw error;
+    }
   }
 
   async getLlmOutputFileContent(filename) {

@@ -59,7 +59,7 @@ module.exports = {
     '<rootDir>/node_modules/',
     '<rootDir>/dist/',
     '<rootDir>/build/',
-    '<rootDir>/src/inference/model-serving.test.ts',
+    // '<rootDir>/src/inference/model-serving.test.ts',
     '<rootDir>/tests/e2e/',
     '<rootDir>/tests/perf/',
     '<rootDir>/tests/security/',

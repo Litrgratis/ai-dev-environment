@@ -21,16 +21,18 @@ class CompletionService {
       },
     });
 
-    // Test Redis connection
-    this.redis.on("connect", () => {
-      console.log("✅ Redis connected successfully");
-      metricsHelpers.recordRedisOperation("connect", "success");
-    });
+    // Test Redis connection (only if .on exists)
+    if (typeof this.redis.on === "function") {
+      this.redis.on("connect", () => {
+        console.log("✅ Redis connected successfully");
+        metricsHelpers.recordRedisOperation("connect", "success");
+      });
 
-    this.redis.on("error", (err) => {
-      console.error("❌ Redis connection error:", err.message);
-      metricsHelpers.recordRedisOperation("connect", "error");
-    });
+      this.redis.on("error", (err) => {
+        console.error("❌ Redis connection error:", err.message);
+        metricsHelpers.recordRedisOperation("connect", "error");
+      });
+    }
   }
 
   // Cache key structure: lang:hash(context)

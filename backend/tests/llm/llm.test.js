@@ -41,7 +41,8 @@ describe("LLM Service Tests", () => {
 
     const { stopMemoryMonitoring } = require("../../src/monitoring/metricsV2.cjs");
     afterEach(async () => {
-        if (completionService && completionService.redis) {
+        // Do not call .quit() on redis mock, as it may not exist
+        if (completionService && completionService.redis && typeof completionService.redis.quit === 'function') {
             await completionService.redis.quit();
         }
         stopMemoryMonitoring();

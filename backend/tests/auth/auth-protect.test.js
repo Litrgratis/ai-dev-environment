@@ -47,10 +47,19 @@ describe("Authentication Protection Tests", () => {
     protectedEndpoints.forEach(({ method, url }) => {
       describe(`${method} ${url}`, () => {
         test("should reject request without token", async () => {
+          // Use required payload structure for validation
+          let payload;
+          if (method === "POST" && url.endsWith("batch")) {
+            payload = { contexts: [{ text: "test context", cursorPosition: 0 }] };
+          } else if (method === "POST") {
+            payload = { context: { text: "test context", cursorPosition: 0 } };
+          } else {
+            payload = undefined;
+          }
           const response = await app.inject({
             method,
             url,
-            payload: method !== "GET" ? { test: "data" } : undefined,
+            payload,
           });
 
           expect(response.statusCode).toBe(401);
@@ -59,39 +68,56 @@ describe("Authentication Protection Tests", () => {
         });
 
         test("should reject request with invalid token", async () => {
+          let payload;
+          if (method === "POST" && url.endsWith("batch")) {
+            payload = { contexts: [{ text: "test context", cursorPosition: 0 }] };
+          } else if (method === "POST") {
+            payload = { context: { text: "test context", cursorPosition: 0 } };
+          } else {
+            payload = undefined;
+          }
           const response = await app.inject({
             method,
             url,
             headers: {
               authorization: `Bearer ${invalidToken}`,
             },
-            payload: method !== "GET" ? { test: "data" } : undefined,
+            payload,
           });
 
           expect(response.statusCode).toBe(401);
         });
 
         test("should reject request with expired token", async () => {
+          let payload;
+          if (method === "POST" && url.endsWith("batch")) {
+            payload = { contexts: [{ text: "test context", cursorPosition: 0 }] };
+          } else if (method === "POST") {
+            payload = { context: { text: "test context", cursorPosition: 0 } };
+          } else {
+            payload = undefined;
+          }
           const response = await app.inject({
             method,
             url,
             headers: {
               authorization: `Bearer ${expiredToken}`,
             },
-            payload: method !== "GET" ? { test: "data" } : undefined,
+            payload,
           });
 
           expect(response.statusCode).toBe(401);
         });
 
         test("should accept request with valid token", async () => {
-          const payload =
-            method !== "GET"
-              ? {
-                  context: { text: "test.", cursorPosition: 5 },
-                }
-              : undefined;
-
+          let payload;
+          if (method === "POST" && url.endsWith("batch")) {
+            payload = { contexts: [{ text: "test context", cursorPosition: 0 }] };
+          } else if (method === "POST") {
+            payload = { context: { text: "test context", cursorPosition: 0 } };
+          } else {
+            payload = undefined;
+          }
           const response = await app.inject({
             method,
             url,

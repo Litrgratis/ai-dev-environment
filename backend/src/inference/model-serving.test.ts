@@ -1,47 +1,41 @@
-import tap from "tap";
-const { createModelServer } = require("./model-serving");
-const nodeFetch = (...args: any[]) => Promise.resolve({
-  status: 200,
-  json: async () => ({
-    output: 'Echo: test input',
-    modelHost: MODEL_HOST,
-    modelPort: MODEL_PORT,
-  })
-});
+import { buildServer } from "../server-fastify.cjs";
 
-const MODEL_HOST = process.env.MODEL_HOST || "127.0.0.1";
-const MODEL_PORT = process.env.MODEL_PORT || "8000";
-const BASE_URL = `http://${MODEL_HOST}:${MODEL_PORT}`;
+describe("Model Serving Endpoints", () => {
+  let app;
 
-/** @type {import('fastify').FastifyInstance | undefined} */
-let fastify: any = undefined;
-
-tap.before(async () => {
-  fastify = createModelServer();
-  await fastify.listen({ host: MODEL_HOST, port: parseInt(MODEL_PORT, 10) });
-});
-
-tap.teardown(async () => {
-  if (fastify) await fastify.close();
-});
-
-tap.test("POST /inference returns echo and model info", async (t: any) => {
-  t.teardown(() => fastify && fastify.close()); // jawne zamknięcie
-  const response = await nodeFetch(`${BASE_URL}/inference`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ input: "test input" }),
+  beforeAll(async () => {
+    app = await buildServer();
+    await app.ready();
   });
-  t.equal(response.status, 200, "Should return 200 OK");
-  const data = await response.json();
-  t.match(
-    data,
-    {
-      output: /Echo: test input/,
-      modelHost: MODEL_HOST,
-      modelPort: MODEL_PORT,
-    },
-    "Response should contain echo and model info",
-  );
+
+  afterAll(async () => {
+    if (app) await app.close();
+  });
+
+  it("should respond to GET /inference with model info", async () => {
+    const response = await app.inject({
+      method: "GET",
+      url: "/inference",
+    });
+    expect(response.statusCode).toBe(200);
+    const body = JSON.parse(response.body);
+    expect(body).toHaveProperty("model");
+    expect(body).toHaveProperty("status");
+  });
+
+  it("should respond to POST /inference with completion", async () => {
+    // You may need to adjust payload to match backend validation
+    const response = await app.inject({
+      method: "POST",
+      url: "/inference",
+      payload: {
+        prompt: "console.",
+        language: "javascript",
+      },
+    });
+    expect([200, 201]).toContain(response.statusCode);
+    const body = JSON.parse(response.body);
+    expect(body).toHaveProperty("completion");
+  });
 });
 
