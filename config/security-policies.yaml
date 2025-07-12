@@ -6,3 +6,33 @@ policies:
     - https://ai-dev-env.local
   rateLimit:
     requestsPerMinute: 60
+
+ollama:
+  allowAutoHealing: true
+  allowSystemExpansion: true
+  restrictedCommands:
+    - sudo
+    - rm -rf /
+    - usermod
+    - reboot
+    - shutdown
+    - mkfs
+    - dd
+  allowedCodeActions:
+    - code_generation
+    - autohealing
+    - system_expansion
+  modelAccess:
+    allowedModels:
+      - llama2
+      - gemma
+      - mistral
+    restrictedModels:
+      - experimental
+  network:
+    allowedPorts:
+      - 11434
+    enforceHTTPS: true
+  audit:
+    logAllActions: true
+    alertOnCriticalAttempt: true
