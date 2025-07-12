@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ollama-config
+  namespace: ai-dev-environment
+data:
+  models-to-pull.txt: |
+    codellama:7b-instruct
+    llama3.1:8b-instruct
+    mistral:7b-instruct
+    deepseek-coder:6.7b-instruct
+  entrypoint.sh: |
+    #!/bin/bash
+    ollama serve &
+    sleep 10
+    if [ -f /tmp/models-to-pull.txt ]; then
+        while IFS= read -r model; do
+            echo "Pulling model: $model"
+            ollama pull "$model"
+        done < /tmp/models-to-pull.txt
+    fi
+    wait

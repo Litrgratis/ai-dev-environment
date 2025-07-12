@@ -1,0 +1,4 @@
+codellama:7b-instruct
+llama3.1:8b-instruct
+mistral:7b-instruct
+deepseek-coder:6.7b-instruct
